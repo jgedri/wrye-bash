@@ -28,11 +28,28 @@ import wx
 from .. import bass, balt, bosh, bolt, load_order
 from ..balt import TextCtrl, StaticText, vSizer, hSizer, hspacer, Button, \
     RoTextCtrl, bell, Link, toggleButton, SaveButton, CancelButton, hspace, \
-    vspace, BaltFrame, Resources, HtmlCtrl
+    vspace, BaltFrame, Resources, HtmlCtrl, bitmapButton
 from ..bolt import GPath
 from ..bosh import omods
 from ..exception import BoltError
 
+# If comtypes is not installed, the IE ActiveX control cannot be imported
+try:
+    if 'phoenix' in wx.version():  # ===PHOENIX HACKS & FIXES===
+        #### import wx.html2 as webview  # wx3/PHOENIX TESTING
+        wx.ArtProvider_GetBitmap = wx.ArtProvider.GetBitmap  # wx28/PHOENIX FIX quick HACK
+        bHaveComTypes = False
+    else:
+        import wx.lib.iewin
+        bHaveComTypes = True
+    # import wx.lib.iewin
+    # bHaveComTypes = True
+except ImportError:
+    bHaveComTypes = False
+    bolt.deprint(
+        _(u'Comtypes is missing, features utilizing HTML will be disabled'))
+
+#------------------------------------------------------------------------------
 class DocBrowser(BaltFrame):
     """Doc Browser frame."""
     _frame_settings_key = 'bash.modDocs'
@@ -78,11 +95,26 @@ class DocBrowser(BaltFrame):
         self.docNameBox = RoTextCtrl(self, multiline=False)
         #--Doc display
         self.plainText = RoTextCtrl(self, special=True, autotooltip=False)
-        if HtmlCtrl.html_lib_available():
-            html_ctrl = HtmlCtrl(self)
-            self.htmlText = html_ctrl.text_ctrl
-            self.prevButton = html_ctrl.prevButton
-            self.nextButton = html_ctrl.nextButton
+        # **** UTUMNO: commented below out for HASTY conflict resolution - needs reworking ****
+        # if HtmlCtrl.html_lib_available():
+        #     html_ctrl = HtmlCtrl(self)
+        #     self.htmlText = html_ctrl.text_ctrl
+        #     self.prevButton = html_ctrl.prevButton
+        #     self.nextButton = html_ctrl.nextButton
+        if bHaveComTypes:
+            self.htmlText = wx.lib.iewin.IEHtmlWindow(
+                self, style=wx.NO_FULL_REPAINT_ON_RESIZE)
+            #### self.htmlText = webview.WebView.New(self)  # wx3/PHOENIX TESTING
+            #--Html Back
+            bitmap = wx.ArtProvider_GetBitmap(wx.ART_GO_BACK,
+                                              wx.ART_HELP_BROWSER, (16, 16))
+            self.prevButton = bitmapButton(self, bitmap,
+                                           onBBClick=self.DoPrevPage)
+            #--Html Forward
+            bitmap = wx.ArtProvider_GetBitmap(wx.ART_GO_FORWARD,
+                                              wx.ART_HELP_BROWSER, (16, 16))
+            self.nextButton = bitmapButton(self, bitmap,
+                                           onBBClick=self.DoNextPage)
         else:
             self.htmlText = None
             self.prevButton = None
@@ -350,10 +382,28 @@ class ModChecker(BaltFrame):
         self.__merged = None
         self.__imported = None
         #--Text
-        self._html_ctrl = HtmlCtrl(self)
-        self.gTextCtrl = self._html_ctrl.text_ctrl
-        gBackButton = self._html_ctrl.prevButton # may be None
-        gForwardButton = self._html_ctrl.nextButton # may be None
+        # **** UTUMNO: commented below out for HASTY conflict resolution - needs reworking ****
+        # self._html_ctrl = HtmlCtrl(self)
+        # self.gTextCtrl = self._html_ctrl.text_ctrl
+        # gBackButton = self._html_ctrl.prevButton # may be None
+        # gForwardButton = self._html_ctrl.nextButton # may be None
+        if bHaveComTypes:
+            self.gTextCtrl = wx.lib.iewin.IEHtmlWindow(
+                self, style=wx.NO_FULL_REPAINT_ON_RESIZE)
+            #### self.gTextCtrl = webview.WebView.New(self)  # wx3/PHOENIX TESTING
+            #--Buttons
+            bitmap = wx.ArtProvider_GetBitmap(wx.ART_GO_BACK,
+                                              wx.ART_HELP_BROWSER, (16, 16))
+            gBackButton = bitmapButton(self, bitmap,
+                                       onBBClick=self.gTextCtrl.GoBack)
+            bitmap = wx.ArtProvider_GetBitmap(wx.ART_GO_FORWARD,
+                                              wx.ART_HELP_BROWSER, (16, 16))
+            gForwardButton = bitmapButton(self, bitmap,
+                                          onBBClick=self.gTextCtrl.GoForward)
+        else:
+            self.gTextCtrl = RoTextCtrl(self, special=True)
+            gBackButton = None
+            gForwardButton = None
         gUpdateButton = Button(self, _(u'Update'), onButClick=self.CheckMods)
         def _toggle_button(caption):
             return toggleButton(self, caption, onClickToggle=self.CheckMods)
