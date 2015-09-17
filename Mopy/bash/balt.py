@@ -41,6 +41,20 @@ from functools import partial, wraps
 from collections import OrderedDict
 #--wx
 import wx
+if 'phoenix' in wx.version():  # ===PHOENIX PORTING HACKS & FIXES===
+    wx.SystemSettings_GetFont = wx.SystemSettings.GetFont  # wx28/PHOENIX FIX quick HACK
+    wx.PyDropTarget = wx.DropTarget  # PHOENIX quick HACK
+    wx.EmptyIcon = wx.Icon  # PHOENIX wxPyDeprecationWarning HACK
+    wx.EmptyBitmap = wx.Bitmap  # PHOENIX wxPyDeprecationWarning HACK
+    wx.EmptyImage = wx.Image  # PHOENIX wxPyDeprecationWarning HACK
+    wx.BitmapFromImage = wx.Bitmap  # PHOENIX wxPyDeprecationWarning HACK
+    wx.ArtProvider_GetBitmap = wx.ArtProvider.GetBitmap  # wx28/PHOENIX FIX quick HACK
+    wx.ListEvent.m_itemIndex = wx.ListEvent.Index  # wx28/PHOENIX FIX quick HACK
+    # import wx.html2 as webview  # wx3/PHOENIX TESTING
+    # wx.ListCtrl.InsertStringItem = wx.ListCtrl.InsertItem  # PHOENIX wxPyDeprecationWarning HACK
+    # wx.ListCtrl.SetStringItem = wx.ListCtrl.SetItem  # PHOENIX wxPyDeprecationWarning HACK
+    # wx.Menu.AppendMenu = wx.Menu.Append  # PHOENIX wxPyDeprecationWarning HACK
+    # wx.Menu.AppendItem = wx.Menu.Append  # PHOENIX wxPyDeprecationWarning HACK
 from wx.lib.mixins.listctrl import ListCtrlAutoWidthMixin
 from wx.lib.embeddedimage import PyEmbeddedImage
 import wx.lib.newevent
@@ -925,6 +939,8 @@ class WryeLog(_Log):
         #--Text
         self._html_ctrl = HtmlCtrl(self.window)
         self._html_ctrl.text_ctrl.Navigate(logPath.s,0x2) #--0x2: Clear History
+        #### import wx.html2 as webview  # wx3/PHOENIX TESTING
+        #### textCtrl_ = webview.WebView.New(window)  # PHOENIX TESTING
         #--Buttons
         gOkButton = OkButton(self.window, onButClick=self.window.Close, default=True)
         if not asDialog:
@@ -1560,6 +1576,7 @@ class ListCtrl(wx.ListCtrl, ListCtrlAutoWidthMixin):
         """Insert an item to the list control giving it an internal id."""
         i = self.__id(item)
         some_long = self.InsertStringItem(index, value) # index ?
+        #### some_long = self.InsertItem(index, value) # index ?  # PHOENIX FIX
         gItem = self.GetItem(index) # that's what Tank did
         gItem.SetData(i)  # Associate our id with that row.
         self.SetItem(gItem) # this is needed too - yak
@@ -1727,6 +1744,10 @@ class UIList(wx.Panel):
 
     def OnItemSelected(self, event):
         modName = self.GetItem(event.m_itemIndex)
+        #### modName = self.GetItem(event.Index)  # wx28/PHOENIX FIX
+        #### print('DEBUG event.Index: %s' % event.Index)  # wx28/PHOENIX DEBUG
+        #### print('DEBUG event.m_itemIndex: %s' % event.m_itemIndex)  # wx28/PHOENIX DEBUG
+        #### print('DEBUG OnItemSelected: %s' % (event.Index == event.m_itemIndex))  # wx28/PHOENIX DEBUG
         self._select(modName)
     def _select(self, item): self.panel.SetDetails(item)
 
@@ -1762,6 +1783,7 @@ class UIList(wx.Panel):
                 self.__gList.InsertListCtrlItem(itemDex, labelTxt, item)
             else:
                 self.__gList.SetStringItem(itemDex, colDex, labelTxt)
+                #### self._gList.SetItem(itemDex, colDex, labelTxt)  # PHOENIX FIX
         self.__setUI(item, itemDex)
 
     class _ListItemFormat(object):
@@ -2486,6 +2508,7 @@ class ItemLink(Link):
         menuItem = wx.MenuItem(menu, self._id, self._text, self.menu_help,
                                self.__class__.kind)
         menu.AppendItem(menuItem)
+        #### menu.Append(menuItem)  # PHOENIX wxPyDeprecationWarning FIX
         return menuItem
 
     def iselected_infos(self):
@@ -2531,6 +2554,7 @@ class MenuLink(Link):
         Link.Frame.Bind(wx.EVT_MENU_OPEN, MenuLink.OnMenuOpen)
         subMenu = wx.Menu()
         menu.AppendMenu(self._id, self.text, subMenu)
+        #### menu.Append(self._id, self.text, subMenu)  # PHOENIX wxPyDeprecationWarning FIX
         if not self._enable():
             menu.Enable(self._id, False)
         else: # do not append sub links unless submenu enabled
