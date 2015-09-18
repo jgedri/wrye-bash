@@ -2632,8 +2632,8 @@ class InstallersDetails(_DetailsMixin, SashPanel):
                     [x not in installer.espmNots for x in names])
             #--Comments
             self.gComments.SetValue(installer.comments)
-        if wx.Platform == '__WXMSW__': # this only works on windows
-            self.gPackage.HideNativeCaret()
+        ### if wx.Platform == '__WXMSW__': # this only works on windows
+        ###     self.gPackage.HideNativeCaret()  # Why are we hiding the caret? This is also missing or not hooked in for PHOENIX
 
     def _resetDetails(self):
         self.gPackage.SetValue(u'')
