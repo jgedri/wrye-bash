@@ -63,7 +63,16 @@ def _import_wx():
     """Import wxpython or show a tkinter error and exit if unsuccessful."""
     global _wx
     try:
+        # Import wx once and for all
+        WXVER = '3.0.2.0'
+        import wxversion
+        if wxversion.checkInstalled(WXVER):
+            wxversion.select(WXVER)
+            versionOK = True
+        else:
+            versionOK = False
         import wx as _wx
+        bass.wx = _wx
     except ImportError:
         but_kwargs = {'text': _(u"QUIT"),
                       'fg': 'red'}  # foreground button color

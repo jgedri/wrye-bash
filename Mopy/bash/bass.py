@@ -98,3 +98,5 @@ def get_ini_option(ini_parser, option_key, section_key=u'General'):
     if not ini_parser or not ini_parser.has_option(section_key, option_key):
         return None
     return ini_parser.get(section_key, option_key)
+
+wx = None
