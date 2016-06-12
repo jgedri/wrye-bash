@@ -24,10 +24,10 @@
 
 import string
 from types import IntType, LongType
-import wx
 from . import bEnableWizard, tabInfo, BashFrame
 from .constants import colorInfo, settingDefaults, installercons
 from .. import bass, balt, bosh, bolt, bush, env
+from ..bass import wx
 from ..balt import Button, hSizer, Link, colors, RoTextCtrl, vSizer, hspacer, \
     checkBox, StaticText, Image, bell, TextCtrl, tooltip, OkButton, \
     CancelButton, ApplyButton, hspace, vspace, Resources
