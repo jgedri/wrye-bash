@@ -3872,6 +3872,8 @@ class BashFrame(BaltFrame):
 
     def OnCloseWindow(self):
         """Handle Close event. Save application data."""
+        self.statusBar.Unbind(wx.EVT_SIZE)
+        self.Unbind(wx.EVT_CLOSE)
         try:
             # copy pasted from super.OnCloseWindow() -> in the finally clause
             # here position is not saved
