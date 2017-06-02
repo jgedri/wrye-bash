@@ -25,6 +25,7 @@
 """This modules defines static data for use by bush, when TES V:
    Skyrim is set at the active game."""
 
+from os.path import join as _j
 from .constants import *
 from .default_tweaks import default_tweaks
 from .. import GameInfo
@@ -39,7 +40,7 @@ class SkyrimGameInfo(GameInfo):
     exe = u'TESV.exe'
     masterFiles = [u'Skyrim.esm', u'Update.esm']
     iniFiles = [u'Skyrim.ini', u'SkyrimPrefs.ini']
-    pklfile = r'bash\db\Skyrim_ids.pkl'
+    pklfile = _j('bash', 'db' 'Skyrim_ids.pkl')
     regInstallKeys = (u'Bethesda Softworks\\Skyrim', u'Installed Path')
     nexusUrl = u'http://www.nexusmods.com/skyrim/'
     nexusName = u'Skyrim Nexus'

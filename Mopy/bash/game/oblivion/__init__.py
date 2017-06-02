@@ -25,6 +25,7 @@
 """This modules defines static data for use by bush, when
    TES IV: Oblivion is set at the active game."""
 
+from os.path import join as _j
 from .constants import *
 from .default_tweaks import default_tweaks
 from .. import GameInfo
@@ -105,16 +106,13 @@ class OblivionGameInfo(GameInfo):
     wryeBashDataFiles = GameInfo.wryeBashDataFiles | {
         u'ArchiveInvalidationInvalidated!.bsa'}
     ignoreDataFiles = {
-        u'OBSE\\Plugins\\Construction Set Extender.dll',
-        u'OBSE\\Plugins\\Construction Set Extender.ini'
-    }
+        _j(u'OBSE', u'Plugins', u'Construction Set Extender.dll'),
+        _j(u'OBSE', u'Plugins', u'Construction Set Extender.ini')}
     ignoreDataFilePrefixes = {
-        u'Meshes\\Characters\\_Male\\specialanims\\0FemaleVariableWalk_'
-    }
-    ignoreDataDirs = {
-        u'OBSE\\Plugins\\ComponentDLLs\\CSE',
-        u'LSData'
-    }
+        _j(u'Meshes', u'Characters', u'_Male', u'specialanims',
+           u'0FemaleVariableWalk_')}
+    ignoreDataDirs = {_j(u'OBSE', u'Plugins', u'ComponentDLLs', u'CSE'),
+        u'LSData'}
 
     class esp(GameInfo.esp):
         canBash = True
