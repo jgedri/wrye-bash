@@ -36,6 +36,8 @@ from balt import vspace, hspace
 from env import get_file_version
 import StringIO
 import traceback
+
+import os  # TODO(nycz): remove this, this is only to check os TEMPORARILY
 #---------------------------------------------------
 
 #Translateable strings
@@ -1446,9 +1448,12 @@ class WryeParser(ScriptParser.Parser):
         else:
             imageJoin = bass.dirs['installers'].join(self.path).join
         for i in images:
-            path = imageJoin(i)
-            if not path.exists() and bass.dirs['mopy'].join(i).exists():
-                path = bass.dirs['mopy'].join(i)
+            # FIXME(nycz): ugly garbage hack
+            i = i.split('\\') if os.name == 'posix' else [i]
+            path = imageJoin(*i)
+            if not path.exists() and bass.dirs['mopy'].join(*i).exists():
+                path = bass.dirs['mopy'].join(*i)
+            print path
             image_paths.append(path)
         self.page = PageSelect(self.parent, bMany, _(u'Installer Wizard'), main_desc, titles, descs, image_paths, defaultMap)
     def kwdCase(self, value):

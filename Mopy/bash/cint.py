@@ -162,6 +162,8 @@ else: #attempt to force path to CBash dll
     paths = [join(path,u'CBash.dll') for path in CBashEnabled]
 
 try:
+    if os.name == 'posix':
+        raise ImportError(u"Don't import DLLs on Linux")
     for path in paths:
         if exists(path):
             # CDLL doesn't play with unicode path strings nicely on windows :(

@@ -62,6 +62,11 @@ def _import_wx():
     """Import wxpython or show a tkinter error and exit if unsuccessful."""
     global _wx
     try:
+        import wxversion
+        try:
+            wxversion.select('2.8')
+        except wxversion.VersionError:
+            pass # TODO: note somewhere that it's the wrong version?
         import wx as _wx
     except ImportError:
         but_kwargs = {'text': _(u"QUIT"),
@@ -359,6 +364,9 @@ def _main(opts):
                     return  # Quit
 
     app.Init() # Link.Frame is set here !
+    # TODO remove this, this is only for debugging //nycz
+    # import wx.lib.inspection as wxinspect
+    # wxinspect.InspectionTool().Show()
     app.MainLoop()
 
 def _detect_game(opts, backup_bash_ini):
@@ -536,7 +544,9 @@ def _wxSelectGame(ret, msgtext):
 def _rightWxVersion():
     wxver = _wx.version()
     wxver_tuple = _wx.VERSION
-    if wxver != '2.8.12.1 (msw-unicode)' and wxver_tuple < (2,9):
+    if wxver == '2.8.12.1 (gtk2-unicode)':
+        return True # TODO: some note/check here about running linux?
+    elif wxver != '2.8.12.1 (msw-unicode)' and wxver_tuple < (2,9):
         return balt.askYes(
             None, 'Warning: you appear to be using a non-supported version '
             'of wxPython (%s).  This will cause problems!  It is highly '
