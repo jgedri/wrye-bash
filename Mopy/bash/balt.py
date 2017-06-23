@@ -575,6 +575,87 @@ def hsbSizer(parent, box_label=u'', *elements):
     """A horizontal box sizer, but surrounded by a static box."""
     return _aSizer(wx.StaticBoxSizer(wx.StaticBox(parent, label=box_label),
                                      wx.HORIZONTAL), *elements)
+class _SizerWrapper(object):
+    pass
+
+class Box(_SizerWrapper):
+    def __init__(self, vertical=False, parent=None, spacing=0,
+                 default_weight=0, default_grow=False, default_border=0):
+        self._spacing = spacing
+        self._sizer = wx.BoxSizer(wx.VERTICAL if vertical else wx.HORIZONTAL)
+        if parent is not None:
+            parent.SetSizer(self._sizer)
+        self.default_weight = default_weight
+        self.default_grow = default_grow
+        self.default_border = default_border
+
+    def add(self, element, weight=None, grow=None, border=None):
+        if isinstance(element, _SizerWrapper):
+            element = element._sizer
+        if weight is None:
+            weight = self.default_weight
+        if grow is None:
+            grow = self.default_grow
+        if border is None:
+            border = self.default_border
+        flags = wx.ALL | wx.ALIGN_CENTER_VERTICAL
+        if grow:
+            flags |= wx.EXPAND
+        if self._spacing > 0 and not self._sizer.IsEmpty():
+            self._sizer.AddSpacer(self._spacing)
+        self._sizer.Add(element, proportion=weight, flag=flags, border=border)
+
+    def add_many(self, *elements):
+        for element in elements:
+            self.add(element)
+
+    def add_spacer(self, height=4):
+        self._sizer.AddSpacer(height)
+
+    def add_stretch(self, weight=1):
+        self._sizer.AddStretchSpacer(prop=weight)
+
+
+class HBox(Box):
+    def __init__(self, *args, **kwargs):
+        super(HBox, self).__init__(False, *args, **kwargs)
+
+class VBox(Box):
+    def __init__(self, *args, **kwargs):
+        super(VBox, self).__init__(True, *args, **kwargs)
+
+class GridBox(_SizerWrapper):
+    def __init__(self, parent=None, h_spacing=0, v_spacing=0,
+                 default_grow=False, default_border=0):
+        self._sizer = wx.GridBagSizer(hgap=h_spacing, vgap=v_spacing)
+        if parent is not None:
+            parent.SetSizer(self._sizer)
+        self.default_grow = default_grow
+        self.default_border = default_border
+
+    def add(self, col, row, element, grow=None, border=None):
+        if isinstance(element, _SizerWrapper):
+            element = element._sizer
+        if grow is None:
+            grow = self.default_grow
+        if border is None:
+            border = self.default_border
+        flags = wx.ALL
+        if grow:
+            flags |= wx.EXPAND
+        self._sizer.Add(element, (row, col), flag=flags,
+                        border=border)
+
+    def set_stretch(self, col=None, row=None, weight=0):
+        if row is not None:
+            if self._sizer.IsRowGrowable(row):
+                self._sizer.RemoveGrowableRow(row)
+            self._sizer.AddGrowableRow(row, proportion=weight)
+        if col is not None:
+            if self._sizer.IsColGrowable(col):
+                self._sizer.RemoveGrowableCol(col)
+            self._sizer.AddGrowableCol(col, proportion=weight)
+
 
 # Modal Dialogs ---------------------------------------------------------------
 #------------------------------------------------------------------------------
