@@ -24,6 +24,8 @@
 
 # Imports ---------------------------------------------------------------------
 import re
+import urllib
+import urlparse
 
 import bass # for dirs - try to avoid
 #--Localization
@@ -44,6 +46,14 @@ import wx
 from wx.lib.mixins.listctrl import ListCtrlAutoWidthMixin
 from wx.lib.embeddedimage import PyEmbeddedImage
 import wx.lib.newevent
+#--wx webview, may not be present on all systems
+try:
+    # raise ImportError
+    import wx.html2 as _wx_html2
+except ImportError:
+    _wx_html2 = None
+    deprint(
+        _(u'wx.WebView is missing, features utilizing HTML will be disabled'))
 
 class Resources:
     #--Icon Bundles
@@ -60,6 +70,8 @@ defSize = wx.DefaultSize
 
 splitterStyle = wx.SP_LIVE_UPDATE # | wx.SP_3DSASH # ugly but
 # makes borders stand out - we need something to that effect
+
+notFound = wx.NOT_FOUND
 
 # wx Types
 wxPoint = wx.Point
@@ -888,38 +900,119 @@ def showInfo(parent,message,title=_(u'Information'),**kwdargs):
     return askStyled(parent,message,title,wx.OK|wx.ICON_INFORMATION,**kwdargs)
 
 #------------------------------------------------------------------------------
-# If comtypes is not installed, the IE ActiveX control cannot be imported
-try:
-    if wx.Platform != '__WXMSW__':
-        raise ImportError # the import below will crash on linux
-    import wx.lib.iewin as _wx_lib_iewin
-except ImportError:
-    _wx_lib_iewin = None
-    deprint(
-        _(u'Comtypes is missing, features utilizing HTML will be disabled'))
 
-class HtmlCtrl(object):
-
+class HtmlCtrl(wx.Window):
+    """
+    TODO:
+      * buttons disabled when no forward/back history
+      * ctrl-a is slow when WebView is active
+    """
     @staticmethod
-    def html_lib_available(): return _wx_lib_iewin
+    def html_lib_available(): return bool(_wx_html2)
 
     def __init__(self, parent):
-        if not _wx_lib_iewin:
-            self.text_ctrl = RoTextCtrl(parent, special=True)
-            self.prevButton = self.nextButton = None
-            return
-        self.text_ctrl = _wx_lib_iewin.IEHtmlWindow(parent,
-            style=wx.NO_FULL_REPAINT_ON_RESIZE)
+        super(HtmlCtrl, self).__init__(parent)
+        # init the fallback/plaintext widget
+        self._text_ctrl = TextCtrl(self, multiline=True, autotooltip=False)
+        self._text_ctrl.SetEditable(False)
+        back = forward = None
+        items = [self._text_ctrl]
+        if _wx_html2:
+            self._html_ctrl = _wx_html2.WebView.New(self,
+                                           style=wx.NO_FULL_REPAINT_ON_RESIZE)
+            items.append(self._html_ctrl)
+            self._text_ctrl.Disable()
+            back = self._html_ctrl.GoBack
+            forward = self._html_ctrl.GoForward
+        self.container = vSizer(*[(item, 3, wx.GROW|wx.ALL) for item in items])
+        def _make_button(bitmap_id, callback):
+            return bitmapButton(parent, wx.ArtProvider_GetBitmap(bitmap_id,
+                           wx.ART_HELP_BROWSER, (16, 16)), onBBClick=callback)
+        self._prev_button = _make_button(wx.ART_GO_BACK, back)
+        self._next_button = _make_button(wx.ART_GO_FORWARD, forward)
+        if not _wx_html2:
+            self._prev_button.Disable()
+            self._next_button.Disable()
+        # else:
+        #     self.container.Hide(self._text_ctrl)
+            # self.container.Layout()
+        self.SetSizer(self.container)
+        self.switch_to_text() # default to text
+
+    @property
+    def text(self):
+        return self._text_ctrl.GetValue()
+
+    @text.setter
+    def text(self, text_):
+        self._text_ctrl.SetValue(text_)
+
+    def load_text(self, text_):
+        self._text_ctrl.SetValue(text_)
+        self._text_ctrl.SetModified(False)
+        self.switch_to_text()
+
+    def is_text_modified(self):
+        return self._text_ctrl.IsModified()
+
+    def set_text_modified(self, modified):
+        if modified:
+            self._text_ctrl.MarkDirty()
+        else:
+            self._text_ctrl.DiscardEdits()
+
+    def set_text_editable(self, editable):
+        # type: (bool) -> None
+        self._text_ctrl.SetEditable(editable)
+
+    def switch_to_html(self):
+        if not _wx_html2: return
+        self.container.Show(self._html_ctrl)
+        self.container.Hide(self._text_ctrl)
+        self._html_ctrl.Enable()
+        self._text_ctrl.Disable()
+        self.Layout()
+
+    def switch_to_text(self):
+        if not _wx_html2: return
+        self.container.Hide(self._html_ctrl)
+        self.container.Show(self._text_ctrl)
+        self._html_ctrl.Disable()
+        self._text_ctrl.Enable()
+        self.Layout()
+
+    def get_buttons(self):
+        return self._prev_button, self._next_button
+
+    def try_load_html(self, file_path, file_text=u''):
+        # type: (bolt.Path) -> None
+        """Load a HTML file if wx.WebView is available, or load the text."""
+        if _wx_html2:
+            self._html_ctrl.ClearHistory()
+            url = urlparse.urljoin(u'file:', urllib.pathname2url(file_path.s))
+            self._html_ctrl.LoadURL(url)
+            self.switch_to_html()
+        else:
+            self.load_text(file_text)
+
+
+   # if not _wx_lib_iewin:
+        #     self.text_ctrl = RoTextCtrl(parent, special=True)
+        #     self.prevButton = self.nextButton = None
+        #     return
+        # self.text_ctrl = wx.html2.WebView.New(parent,
+        # self.text_ctrl = _wx_lib_iewin.IEHtmlWindow(parent,
+        #     style=wx.NO_FULL_REPAINT_ON_RESIZE)
         #--Html Back
-        bitmap = wx.ArtProvider_GetBitmap(wx.ART_GO_BACK, wx.ART_HELP_BROWSER,
-                                          (16, 16))
-        self.prevButton = bitmapButton(parent, bitmap,
-                                       onBBClick=self.text_ctrl.GoBack)
-        #--Html Forward
-        bitmap = wx.ArtProvider_GetBitmap(wx.ART_GO_FORWARD,
-                                          wx.ART_HELP_BROWSER, (16, 16))
-        self.nextButton = bitmapButton(parent, bitmap,
-                                       onBBClick=self.text_ctrl.GoForward)
+        # bitmap = wx.ArtProvider_GetBitmap(wx.ART_GO_BACK, wx.ART_HELP_BROWSER,
+        #                                   (16, 16))
+        # self.prevButton = bitmapButton(parent, bitmap,
+        #                                onBBClick=self.text_ctrl.GoBack)
+        # #--Html Forward
+        # bitmap = wx.ArtProvider_GetBitmap(wx.ART_GO_FORWARD,
+        #                                   wx.ART_HELP_BROWSER, (16, 16))
+        # self.nextButton = bitmapButton(parent, bitmap,
+        #                                onBBClick=self.text_ctrl.GoForward)
 
 class _Log(object):
     _settings_key = 'balt.LogMessage'
@@ -996,16 +1089,16 @@ class WryeLog(_Log):
             logPath = _settings.get('balt.WryeLog.temp',
                 bolt.Path.getcwd().join(u'WryeLogTemp.html'))
             convert_wtext_to_html(logPath, logText)
-        if _wx_lib_iewin is None:
-            # Comtypes not available most likely! so do it this way:
-            import webbrowser
-            webbrowser.open(logPath.s)
-            return
+        # if _wx_lib_iewin is None:
+        #     # Comtypes not available most likely! so do it this way:
+        #     import webbrowser
+        #     webbrowser.open(logPath.s)
+        #     return
         super(WryeLog, self).__init__(parent, logText, title, asDialog,
                                       fixedFont, log_icons)
         #--Text
         self._html_ctrl = HtmlCtrl(self.window)
-        self._html_ctrl.text_ctrl.Navigate(logPath.s,0x2) #--0x2: Clear History
+        self._html_ctrl.try_load_html(file_path=logPath)
         #--Buttons
         gOkButton = OkButton(self.window, onButClick=self.window.Close, default=True)
         if not asDialog:
