@@ -64,7 +64,7 @@ def _import_wx():
     try:
         import wxversion
         try:
-            wxversion.select('2.8')
+            wxversion.select('3.0')
         except wxversion.VersionError:
             pass # TODO: note somewhere that it's the wrong version?
         import wx as _wx

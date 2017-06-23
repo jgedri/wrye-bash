@@ -347,7 +347,7 @@ class TextCtrl(wx.TextCtrl):
         if multiline: style |= wx.TE_MULTILINE ##: would it harm to have them all multiline ?
         wx.TextCtrl.__init__(self, parent, defId, value, size=size, style=style,
                              name=name)
-        if maxChars: self.SetMaxLength(maxChars)
+        #if maxChars: self.SetMaxLength(maxChars)
         if autotooltip:
             self.Bind(wx.EVT_TEXT, self.OnTextChange)
             self.Bind(wx.EVT_SIZE, self.OnSizeChange)
