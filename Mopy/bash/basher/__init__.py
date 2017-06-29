@@ -81,7 +81,7 @@ from .. import balt
 from ..balt import CheckLink, EnabledLink, SeparatorLink, Link, \
     ChoiceLink, RoTextCtrl, staticBitmap, AppendableLink, ListBoxes, \
     SaveButton, CancelButton, INIListCtrl, DnDStatusBar, NotebookPanel, \
-    BaltFrame
+    BaltFrame, set_event_hook, Events
 from ..balt import checkBox, StaticText, spinCtrl, TextCtrl
 from ..balt import hspacer, hSizer, vSizer, hspace, vspace
 from ..balt import colors, images, Image, Resources
@@ -1291,8 +1291,8 @@ class ModDetails(_SashDetailsPanel):
         self._bottom_low_panel.SetSizer(tagsSizer)
         bottom.SetSizer(vSizer((subSplitter,1,wx.EXPAND)))
         #--Events
-        self.gTags.Bind(wx.EVT_CONTEXT_MENU,
-                        lambda __event: self.ShowBashTagsMenu())
+        set_event_hook(self.gTags, Events.CONTEXT_MENU,
+                       lambda __event: self.ShowBashTagsMenu())
 
     def _resetDetails(self):
         self.modInfo = None
@@ -1566,7 +1566,8 @@ class INIDetailsPanel(_DetailsMixin, SashPanel):
         self.comboBox = balt.ComboBox(right, value=self.ini_name,
                                       choices=self._ini_keys)
         #--Events
-        self.comboBox.Bind(wx.EVT_COMBOBOX,self.OnSelectDropDown)
+        set_event_hook(self.comboBox, Events.COMBOBOX_CHOICE,
+                       self.OnSelectDropDown)
         #--Layout
         iniSizer = vSizer(
                 (hSizer(
@@ -2100,7 +2101,8 @@ class InstallersList(balt.UIList):
             elif item == last_marker:
                 event.Veto()
                 return
-        self.edit_control.Bind(wx.EVT_CHAR, self._OnEditLabelChar)
+        set_event_hook(self.edit_control, Events.CHAR_KEY_PRESSED,
+                       self._OnEditLabelChar)
         #--Markers, change the selection to not include the '=='
         if renaming_type is bosh.InstallerMarker:
             to = len(event.GetLabel()) - 2
@@ -2517,7 +2519,8 @@ class InstallersDetails(_DetailsMixin, SashPanel):
         self.gSubList = balt.listBox(subPackagesPanel, isExtended=True,
                                      kind='checklist',
                                      onCheck=self.OnCheckSubItem)
-        self.gSubList.Bind(wx.EVT_RIGHT_UP,self.SubsSelectionMenu)
+        set_event_hook(self.gSubList, Events.MOUSE_RIGHT_UP,
+                       self.SubsSelectionMenu)
         #--Espms
         espmsPanel = wx.Panel(self.checkListSplitter)
         espmsLabel = StaticText(espmsPanel, _(u'Esp/m Filter'))
@@ -2525,7 +2528,8 @@ class InstallersDetails(_DetailsMixin, SashPanel):
         self.gEspmList = balt.listBox(espmsPanel, isExtended=True,
                                       kind='checklist',
                                       onCheck=self.OnCheckEspmItem)
-        self.gEspmList.Bind(wx.EVT_RIGHT_UP,self.SelectionMenu)
+        set_event_hook(self.gEspmList, Events.MOUSE_RIGHT_UP,
+                       self.SelectionMenu)
         #--Comments
         commentsPanel = wx.Panel(bottom)
         commentsLabel = StaticText(commentsPanel, _(u'Comments'))

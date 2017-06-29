@@ -30,7 +30,7 @@ import wx
 from .. import bass, balt, bosh, bolt, load_order
 from ..balt import TextCtrl, StaticText, Button, \
     RoTextCtrl, bell, Link, toggleButton, SaveButton, CancelButton, \
-    BaltFrame, Resources, HtmlCtrl, HBox, VBox, GridBox, checkBox
+    BaltFrame, Resources, HtmlCtrl, HBox, VBox, GridBox, checkBox, set_event_hook
 from ..bolt import GPath
 from ..bosh import omods
 
@@ -342,7 +342,7 @@ class ModChecker(BaltFrame):
         _f(_COPY_TEXT,  'click',  _(u'Copy Text'), callback=self.OnCopyText)
         _f(_UPDATE,     'click',  _(u'Update'))
         #--Events
-        self.Bind(wx.EVT_ACTIVATE, self.OnActivate)
+        set_event_hook(self, balt.Events.ACTIVATE, self.OnActivate)
         # Top row
         top_row = HBox(spacing=4)
         top_row.add_many(back_button, forward_button,

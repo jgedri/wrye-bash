@@ -46,6 +46,7 @@ import wx
 from wx.lib.mixins.listctrl import ListCtrlAutoWidthMixin
 from wx.lib.embeddedimage import PyEmbeddedImage
 import wx.lib.newevent
+import wx.wizard as wiz
 #--wx webview, may not be present on all systems
 try:
     # raise ImportError
@@ -3318,3 +3319,53 @@ class BaltFrame(wx.Frame):
             _settings[_key + '.pos'] = tuple(self.GetPosition())
             _settings[_key + '.size'] = tuple(self.GetSize())
         self.Destroy()
+
+# Event bindings --------------------------------------------------------------
+class Events(object):
+    RESIZE = 'resize'
+    ACTIVATE = 'activate'
+    CLOSE = 'close'
+    TEXT_CHANGED = 'text_changed'
+    CONTEXT_MENU = 'context_menu'
+    CHAR_KEY_PRESSED = 'char_key_pressed'
+    MOUSE_MOTION = 'mouse_motion'
+    MOUSE_LEAVE_WINDOW = 'mouse_leave_window'
+    MOUSE_LEFT_UP = 'mouse_left_up'
+    MOUSE_LEFT_DOWN = 'mouse_left_down'
+    MOUSE_LEFT_DOUBLECLICK = 'mouse_left_doubleclick'
+    MOUSE_RIGHT_UP = 'mouse_right_up'
+    MOUSE_RIGHT_DOWN = 'mouse_right_down'
+    MOUSE_MIDDLE_UP = 'mouse_middle_up'
+    MOUSE_MIDDLE_DOWN = 'mouse_middle_down'
+    WIZARD_CANCEL = 'wizard_cancel'
+    WIZARD_FINISHED = 'wizard_finished'
+    WIZARD_PAGE_CHANGING = 'wizard_page_changing'
+    # TODO(nycz): possibly too specific stuff here, what do?
+    # also the names here... ugh. needless to say its very wip
+    COMBOBOX_CHOICE = 'combobox_choice'
+    COLORPICKER_CHANGED = 'colorpicker_changed'
+
+_WX_EVENTS = {Events.RESIZE:                wx.EVT_SIZE,
+              Events.ACTIVATE:              wx.EVT_ACTIVATE,
+              Events.CLOSE:                 wx.EVT_CLOSE,
+              Events.TEXT_CHANGED:          wx.EVT_TEXT,
+              Events.CONTEXT_MENU:          wx.EVT_CONTEXT_MENU,
+              Events.CHAR_KEY_PRESSED:      wx.EVT_CHAR,
+              Events.MOUSE_MOTION:          wx.EVT_MOTION,
+              Events.MOUSE_LEAVE_WINDOW:    wx.EVT_LEAVE_WINDOW,
+              Events.MOUSE_LEFT_UP:         wx.EVT_LEFT_UP,
+              Events.MOUSE_LEFT_DOWN:       wx.EVT_LEFT_DOWN,
+              Events.MOUSE_LEFT_DOUBLECLICK:wx.EVT_LEFT_DCLICK,
+              Events.MOUSE_RIGHT_UP:        wx.EVT_RIGHT_UP,
+              Events.MOUSE_RIGHT_DOWN:      wx.EVT_RIGHT_DOWN,
+              Events.MOUSE_MIDDLE_UP:       wx.EVT_MIDDLE_UP,
+              Events.MOUSE_MIDDLE_DOWN:     wx.EVT_MIDDLE_DOWN,
+              Events.WIZARD_CANCEL:         wiz.EVT_WIZARD_CANCEL,
+              Events.WIZARD_FINISHED:       wiz.EVT_WIZARD_FINISHED,
+              Events.WIZARD_PAGE_CHANGING:  wiz.EVT_WIZARD_PAGE_CHANGING,
+              Events.COMBOBOX_CHOICE:       wx.EVT_COMBOBOX,
+              Events.COLORPICKER_CHANGED:   wx.EVT_COLOURPICKER_CHANGED,
+}
+
+def set_event_hook(obj, event, callback):
+    obj.Bind(_WX_EVENTS[event], callback)
