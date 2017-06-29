@@ -2715,17 +2715,18 @@ class InstallersDetails(_DetailsMixin, SashPanel):
         installer.refreshDataSizeCrc()
         installer.refreshStatus(self._idata)
         # Save scroll bar positions, because gList.RefreshUI will
-        subScrollPos  = self.gSubList.GetScrollPos(wx.VERTICAL)
-        espmScrollPos = self.gEspmList.GetScrollPos(wx.VERTICAL)
+        # FIXME(nycz): this throws a wx._core.PyAssertionError, window not scrollable
+        # subScrollPos  = self.gSubList.GetScrollPos(wx.VERTICAL)
+        # espmScrollPos = self.gEspmList.GetScrollPos(wx.VERTICAL)
         subIndices = self.gSubList.GetSelections()
         self.installersPanel.uiList.RefreshUI(redraw=[self.displayed_item])
         for subIndex in subIndices:
             self.gSubList.SetSelection(subIndex)
         # Reset the scroll bars back to their original position
-        subScroll = subScrollPos - self.gSubList.GetScrollPos(wx.VERTICAL)
-        self.gSubList.ScrollLines(subScroll)
-        espmScroll = espmScrollPos - self.gEspmList.GetScrollPos(wx.VERTICAL)
-        self.gEspmList.ScrollLines(espmScroll)
+        # subScroll = subScrollPos - self.gSubList.GetScrollPos(wx.VERTICAL)
+        # self.gSubList.ScrollLines(subScroll)
+        # espmScroll = espmScrollPos - self.gEspmList.GetScrollPos(wx.VERTICAL)
+        # self.gEspmList.ScrollLines(espmScroll)
 
     def OnCheckSubItem(self,event):
         """Handle check/uncheck of item."""
