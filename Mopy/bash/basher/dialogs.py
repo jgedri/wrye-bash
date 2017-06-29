@@ -24,14 +24,13 @@
 
 import string
 from types import IntType, LongType
-import wx
 from . import bEnableWizard, tabInfo, BashFrame
 from .constants import colorInfo, settingDefaults, installercons
 from .. import bass, balt, bosh, bolt, bush, env
 from ..balt import Button, Link, colors, RoTextCtrl, checkBox, StaticText, \
     Image, bell, TextCtrl, tooltip, OkButton, CancelButton, ApplyButton, \
     Resources, VLayout, HLayout, GridLayout, LayoutOptions, set_event_hook, \
-    Events, Stretch
+    Events, Stretch, ColorPicker
 from ..bosh import faces
 
 class ColorDialog(balt.Dialog):
@@ -61,8 +60,7 @@ class ColorDialog(balt.Dialog):
         choiceKey = self.text_key[combo_text]
         self.comboBox = balt.ComboBox(self, value=combo_text, choices=colored)
         #--Color Picker
-        self.picker = wx.ColourPickerCtrl(self)
-        self.picker.SetColour(colors[choiceKey])
+        self.picker = ColorPicker(self, colors[choiceKey])
         #--Description
         help_ = colorInfo[choiceKey][1]
         self.textCtrl = RoTextCtrl(self, help_)
@@ -141,7 +139,7 @@ class ColorDialog(balt.Dialog):
         self.applyAll.Enable(anyChanged)
         self.default.Enable(not default)
         self.defaultAll.Enable(not allDefault)
-        self.picker.SetColour(color)
+        self.picker.set_color(color)
         self.comboBox.SetFocusFromKbd()
 
     def OnDefault(self,event):
@@ -250,7 +248,7 @@ class ColorDialog(balt.Dialog):
     def OnColorPicker(self,event):
         event.Skip()
         color_key = self.GetColorKey()
-        newColor = self.picker.GetColour()
+        newColor = self.picker.get_color()
         self.changes[color_key] = newColor
         self.UpdateUIButtons()
 
