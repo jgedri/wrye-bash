@@ -29,14 +29,27 @@ class Widget(object):
     def __init__(self):
         self._native_widget = None  # type: _wx.Window
 
-    def enable(self): self._native_widget.Enable()
-    def disable(self): self._native_widget.Disable()
-    def set_enabled(self, enabled):
+    @property
+    def enabled(self): return self._native_widget.IsEnabled()
+    @enabled.setter
+    def enabled(self, enabled):
         # type: (bool) -> None
         self._native_widget.Enable(enabled)
 
+    @property
+    def tooltip(self):
+        return self._native_widget.GetToolTipString()
+    @tooltip.setter
+    def tooltip(self, text):
+        if not text:
+            self._native_widget.UnsetToolTip()
+        else:
+            self._native_widget.SetToolTip(text)
+
 # Buttons ---------------------------------------------------------------------
-class Button(Widget):
+class _AbstractButton(Widget): pass
+
+class Button(_AbstractButton):
     _id = _wx.ID_ANY
     default_label = u''
     def __init__(self, parent, label=u'', on_click=None, tooltip=None,
@@ -44,15 +57,14 @@ class Button(Widget):
         super(Button, self).__init__()
         if not label and self.__class__.default_label:
             label = self.__class__.default_label
-        self._native_widget = _wx.Button(parent,
-                                         self.__class__._id,
-                                         label=label)
+        self._native_widget = _wx.Button(parent, self.__class__._id,
+                                         label=label, name=u'button')
         if on_click:
             self._native_widget.Bind(_wx.EVT_BUTTON, lambda __evt: on_click)
-        if tooltip:
-            self._native_widget.SetToolTip(tooltip)
         if default:
             self._native_widget.SetDefault()
+        if tooltip:
+            self.tooltip = tooltip
 
 class OkButton(Button): _id = _wx.ID_OK
 class CancelButton(Button):
@@ -67,3 +79,44 @@ class RevertToSavedButton(Button): _id = _wx.ID_REVERT_TO_SAVED
 class OpenButton(Button): _id = _wx.ID_OPEN
 class SelectAllButton(Button): _id = _wx.ID_SELECTALL
 class ApplyButton(Button): _id = _wx.ID_APPLY
+
+class ToggleButton(_AbstractButton):
+    def __init__(self, parent, label=u'', on_toggle=None, tooltip=None):
+        super(ToggleButton, self).__init__()
+        self._native_widget = _wx.ToggleButton(parent, _wx.ID_ANY,
+                                               label=label, name=u'button')
+        if on_toggle:
+            def _toggle_callback(event):
+                on_toggle(self._native_widget.GetValue())
+            self._native_widget.Bind(_wx.EVT_TOGGLEBUTTON, _toggle_callback)
+        if tooltip:
+            self.tooltip = tooltip
+
+    @property
+    def toggled(self): return self._native_widget.GetValue()
+    @toggled.setter
+    def toggled(self, value):
+        # type: (bool) -> None
+        self._native_widget.SetValue(value)
+
+class CheckBox(_AbstractButton):
+    def __init__(self, parent, label=u'', on_toggle=None, tooltip=None,
+                 checked=False):
+        super(CheckBox, self).__init__()
+        self._native_widget = _wx.CheckBox(parent, _wx.ID_ANY,
+                                           label=label, name=u'checkBox')
+        if on_toggle:
+            def _toggle_callback(event):
+                on_toggle(self._native_widget.GetValue())
+            self._native_widget.Bind(_wx.EVT_CHECKBOX, _toggle_callback)
+        if tooltip:
+            self.tooltip = tooltip
+        self.checked = checked
+
+    @property
+    def checked(self): return self._native_widget.GetValue()
+    @checked.setter
+    def checked(self, value):
+        # type: (bool) -> None
+        self._native_widget.SetValue(value)
+

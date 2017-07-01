@@ -29,10 +29,10 @@ from collections import OrderedDict
 import wx
 from .. import bass, balt, bosh, bolt, load_order
 from ..balt import TextCtrl, StaticText, RoTextCtrl, bell, Link, \
-    toggleButton, BaltFrame, Resources, HtmlCtrl, checkBox, set_event_hook
+    BaltFrame, Resources, HtmlCtrl, set_event_hook
 from ..gui.layouts import HLayout, VLayout, GridLayout, LayoutOptions, \
     Spacer, Stretch, CENTER
-from ..gui import Button, CancelButton, SaveButton
+from ..gui import Button, CancelButton, SaveButton, ToggleButton, CheckBox
 from ..bolt import GPath
 from ..bosh import omods
 
@@ -72,8 +72,8 @@ class DocBrowser(BaltFrame):
                                   on_click=self._do_forget)
         self._rename_btn = Button(main_window, _(u'Rename Doc...'),
                                   on_click=self._do_rename)
-        self._edit_btn = toggleButton(main_window, label=_(u'Edit Doc...'),
-                                      onClickToggle=self._do_edit)
+        self._edit_btn = ToggleButton(main_window, label=_(u'Edit Doc...'),
+                                      on_toggle=self._do_edit)
         self._open_btn = Button(main_window, _(u'Open Doc...'),
                                 on_click=self._do_open,
                                 tooltip=_(u'Open doc in external editor.'))
@@ -127,14 +127,13 @@ class DocBrowser(BaltFrame):
         else:
             doc_path.start()
 
-    def _do_edit(self):
+    def _do_edit(self, is_editing):
         """Handle "Edit Doc" button click."""
         self.DoSave()
-        editing = self._edit_btn.GetValue()
-        self._db_is_editing[self._mod_name] = editing
-        self._doc_ctrl.set_text_editable(editing)
+        self._db_is_editing[self._mod_name] = is_editing
+        self._doc_ctrl.set_text_editable(is_editing)
         self._load_data(path=self._db_doc_paths.get(self._mod_name),
-                        editing=editing)
+                        editing=is_editing)
 
     def _do_forget(self):
         """Handle "Forget Doc" button click.
@@ -147,7 +146,7 @@ class DocBrowser(BaltFrame):
         del self._db_doc_paths[self._mod_name]
         self.DoSave()
         for btn in (self._forget_btn, self._rename_btn):
-            btn.disable()
+            btn.enabled = False
         self._doc_name_box.Clear()
         self._load_data(data=u'')
 
@@ -224,7 +223,7 @@ class DocBrowser(BaltFrame):
         """Sets the mod to show docs for."""
         self.DoSave()
         # defaults
-        self._edit_btn.SetValue(False)
+        self._edit_btn.toggled = False
         self._doc_ctrl.set_text_editable(False)
         mod_name = GPath(mod_name)
         self._mod_name = mod_name
@@ -232,16 +231,16 @@ class DocBrowser(BaltFrame):
         if not mod_name:
             self._load_data(data=u'')
             for btn in self._buttons:
-                btn.Disable()
+                btn.enabled = False
             return
-        self._set_btn.enable()
+        self._set_btn.enabled = True
         self._mod_list.SetSelection(self._mod_list.FindString(mod_name.s))
         # Doc path
         doc_path = self._db_doc_paths.get(mod_name, GPath(u''))
         self._doc_name_box.SetValue(doc_path.stail)
         for btn in (self._forget_btn, self._rename_btn, self._edit_btn,
                     self._open_btn):
-            btn.Enable(bool(doc_path))
+            btn.enabled = bool(doc_path)
         # Set empty and uneditable if there's no doc path:
         if not doc_path:
             self._load_data(data=u'')
@@ -259,7 +258,7 @@ class DocBrowser(BaltFrame):
             self._load_data(data=string.Template(template)
                                             .substitute(modName=mod_name.s))
             # Start edit mode
-            self._edit_btn.SetValue(True)
+            self._edit_btn.toggled = True
             self._doc_ctrl.set_text_editable(True)
             self._doc_ctrl.set_text_modified(True)
             # Save the new file
@@ -267,7 +266,7 @@ class DocBrowser(BaltFrame):
         else:  # Otherwise it exists
             editing = self._db_is_editing.get(mod_name, False)
             if editing:
-                self._edit_btn.SetValue(True)
+                self._edit_btn.toggled = True
                 self._doc_ctrl.set_text_editable(True)
             else:
                 is_wtxt = self._get_is_wtxt(doc_path)
@@ -319,14 +318,18 @@ class ModChecker(BaltFrame):
         def _f(key, type_, caption, setting_key=None, setting_value=None,
                callback=self.CheckMods):
             if type_ == 'toggle':
-                btn = toggleButton(self, caption, onClickToggle=callback)
+                btn = ToggleButton(self, caption, on_toggle=callback)
             elif type_ == 'check':
-                btn = checkBox(self, caption, onCheck=callback)
+                btn = CheckBox(self, caption, on_toggle=callback)
             elif type_ == 'click':
                 btn = Button(self, caption, on_click=callback)
             if setting_key is not None:
-                btn.SetValue(bass.settings.get(
-                    'bash.modChecker.show{}'.format(setting_key), setting_value))
+                new_value = bass.settings.get(
+                    'bash.modChecker.show{}'.format(setting_key), setting_value)
+                if type_ == 'toggle':
+                    btn.toggled = new_value
+                elif type_ == 'check':
+                    btn.checked = new_value
                 self._setting_names[key] = setting_key
             self._buttons[key] = btn
         _f(_MOD_LIST,   'toggle', _(u'Mod List'), 'ModList', False)
@@ -365,11 +368,11 @@ class ModChecker(BaltFrame):
         text_ = re.sub(u'<[^>]+>', '', text_, re.U)
         balt.copyToClipboard(text_)
 
-    def CheckMods(self):
+    def CheckMods(self, new_value_=None):
         """Do mod check."""
         for btn_id in [_MOD_LIST, _RULE_SETS]:
             _set_mod_checker_setting(self._setting_names[btn_id],
-                                     self._buttons[btn_id].GetValue())
+                                     self._buttons[btn_id].checked)
         # Enable or disable the children of ModList and RuleSets buttons
         for parent, btn_ids in [(_MOD_LIST, (_CRC, _VERSION)),
                                 (_RULE_SETS, (_NOTES, _CONFIG, _SUGGEST))]:
@@ -379,7 +382,7 @@ class ModChecker(BaltFrame):
         # Set settings from all the buttons' values
         for btn_id in [_NOTES, _CONFIG, _SUGGEST, _CRC, _VERSION]:
             _set_mod_checker_setting(self._setting_names[btn_id],
-                                     self._buttons[btn_id].GetValue())
+                                     self._buttons[btn_id].checked)
         #--Cache info from modinfos to support auto-update.
         self.orderedActive = load_order.cached_active_tuple()
         self.__merged = bosh.modInfos.merged.copy()
@@ -389,7 +392,7 @@ class ModChecker(BaltFrame):
             *[_get_mod_checker_setting(self._setting_names[key])
               for key in [_MOD_LIST, _RULE_SETS, _NOTES, _CONFIG, _SUGGEST,
                           _CRC, _VERSION]],
-            mod_checker=(None, self)[self._buttons[_SCAN_DIRTY].GetValue()])
+            mod_checker=(None, self)[self._buttons[_SCAN_DIRTY].checked])
         if HtmlCtrl.html_lib_available():
             log_path = bass.dirs['saveBase'].join(u'ModChecker.html')
             balt.convert_wtext_to_html(log_path, self.check_mods_text)

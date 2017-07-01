@@ -441,27 +441,6 @@ def ok_and_cancel_group(parent, on_ok=None):
     return HLayout(spacing=4, items=[gui.OkButton(parent, on_click=on_ok),
                                      gui.CancelButton(parent)])
 
-def toggleButton(parent, label=u'', pos=defPos, size=defSize, style=0,
-                 val=defVal, name='button', onClickToggle=None,
-                 toggle_tip=None):
-    """Creates a toggle button, binds toggle function, then returns bound
-    button."""
-    gButton = wx.ToggleButton(parent, defId, label, pos, size, style, val,
-                              name)
-    if onClickToggle: gButton.Bind(wx.EVT_TOGGLEBUTTON,
-                                   lambda __event: onClickToggle())
-    if toggle_tip: gButton.SetToolTip(tooltip(toggle_tip))
-    return gButton
-
-def checkBox(parent, label=u'', pos=defPos, size=defSize, style=0, val=defVal,
-             name='checkBox', onCheck=None, checkbox_tip=None, checked=False):
-    """Creates a checkBox, binds check function, then returns bound button."""
-    gCheckBox = wx.CheckBox(parent, defId, label, pos, size, style, val, name)
-    if onCheck: gCheckBox.Bind(wx.EVT_CHECKBOX, lambda __event: onCheck())
-    if checkbox_tip: gCheckBox.SetToolTip(tooltip(checkbox_tip))
-    gCheckBox.SetValue(checked)
-    return gCheckBox
-
 class StaticText(wx.StaticText):
     """Static text element."""
 
@@ -596,7 +575,7 @@ def askContinueShortTerm(parent, message, title=_(u'Warning')):
 
 def _continueDialog(parent, message, title, checkBoxText):
     with Dialog(parent, title, size=(350, -1)) as dialog:
-        gCheckBox = checkBox(dialog, checkBoxText)
+        gCheckBox = gui.CheckBox(dialog, checkBoxText)
         #--Layout
         VLayout(border=6, spacing=6, default_fill=True, items=[
             (HLayout(spacing=6, items=[
@@ -609,7 +588,7 @@ def _continueDialog(parent, message, title, checkBoxText):
         ]).apply_to(dialog, fit=False)
         #--Get continue key setting and return
         result = dialog.ShowModal()
-        check = gCheckBox.GetValue()
+        check = gCheckBox.checked
         return result, check
 
 #------------------------------------------------------------------------------

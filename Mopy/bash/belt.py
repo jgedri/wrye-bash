@@ -35,6 +35,7 @@ import bosh, balt, bolt, bush
 from balt import Image, set_event_hook, Events
 from gui.layouts import VLayout, LayoutOptions, HBoxedLayout, \
     GridLayout, Stretch, HLayout, CENTER, RIGHT, BOTTOM
+from gui import CheckBox
 from env import get_file_version
 import StringIO
 import traceback
@@ -411,13 +412,13 @@ class PageFinish(PageInstaller):
         self.listTweaks = balt.listBox(self)
         self.parent.ret.IniEdits = iniedits
         # Apply/install checkboxes
-        self.checkApply = balt.checkBox(self, _(u'Apply these selections'),
-                                        onCheck=self.OnCheckApply,
-                                        checked=bAuto)
+        self.checkApply = CheckBox(self, _(u'Apply these selections'),
+                                   on_toggle=self.OnCheckApply,
+                                   checked=bAuto)
         auto = bass.settings['bash.installers.autoWizard']
-        self.checkInstall = balt.checkBox(self, _(u'Install this package'),
-                                          onCheck=self.OnCheckInstall,
-                                          checked=auto)
+        self.checkInstall = CheckBox(self, _(u'Install this package'),
+                                     on_toggle=self.OnCheckInstall,
+                                     checked=auto)
         self.parent.ret.Install = auto
         # Layout
         layout = VLayout(default_fill=True, spacing=4, items=[
@@ -447,11 +448,11 @@ class PageFinish(PageInstaller):
         self.parent.finishing = True
         self.Layout()
 
-    def OnCheckApply(self):
-        self._enableForward(self.checkApply.IsChecked())
+    def OnCheckApply(self, is_checked):
+        self._enableForward(is_checked)
 
-    def OnCheckInstall(self):
-        self.parent.ret.Install = self.checkInstall.IsChecked()
+    def OnCheckInstall(self, is_checked):
+        self.parent.ret.Install = is_checked
 
     def GetNext(self): return None
 
@@ -529,8 +530,8 @@ class PageVersions(PageInstaller):
         text_warning = _text(_(u'WARNING: The following version requirements are not met for using this installer.'))
         text_warning.Wrap(parent.GetPageSize()[0]-20)
 
-        self.checkOk = balt.checkBox(self, _(u'Install anyway.'),
-                                     onCheck=self.OnCheck)
+        self.checkOk = CheckBox(self, _(u'Install anyway.'),
+                                on_toggle=self.OnCheck)
         VLayout(items=[
             Stretch(1),
             (text_warning, LayoutOptions(h_align=CENTER)),
@@ -543,8 +544,8 @@ class PageVersions(PageInstaller):
         self._enableForward(False)
         self.Layout()
 
-    def OnCheck(self):
-        self._enableForward(self.checkOk.IsChecked())
+    def OnCheck(self, is_checked):
+        self._enableForward(is_checked)
 # END PageVersions -----------------------------------------------
 
 # WryeParser -----------------------------------------------------

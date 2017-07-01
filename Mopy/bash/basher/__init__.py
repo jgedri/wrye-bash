@@ -81,13 +81,13 @@ from .. import balt
 from ..balt import CheckLink, EnabledLink, SeparatorLink, Link, \
     ChoiceLink, RoTextCtrl, staticBitmap, AppendableLink, ListBoxes, \
     INIListCtrl, DnDStatusBar, NotebookPanel, BaltFrame, set_event_hook, Events
-from ..balt import checkBox, StaticText, spinCtrl, TextCtrl
+from ..balt import StaticText, spinCtrl, TextCtrl
 from ..balt import colors, images, Image, Resources
 from ..balt import Links, ItemLink
 
 from ..gui.layouts import HLayout, VLayout, LayoutOptions, Spacer, Stretch, \
     RIGHT, TOP
-from ..gui import Button, CancelButton, SaveButton
+from ..gui import Button, CancelButton, SaveButton, CheckBox
 
 # Constants -------------------------------------------------------------------
 from .constants import colorInfo, settingDefaults, karmacons, installercons
@@ -1094,15 +1094,15 @@ class _EditableMixin(_DetailsMixin):
         #--Save/Cancel
         self.save = SaveButton(buttonsParent, on_click=self.DoSave)
         self.cancel = CancelButton(buttonsParent, on_click=self.DoCancel)
-        self.save.disable()
-        self.cancel.disable()
+        self.save.enabled = False
+        self.cancel.enabled = False
 
     # Details panel API
     def SetFile(self, fileName='SAME'):
         #--Edit State
         self.edited = False
-        self.save.disable()
-        self.cancel.disable()
+        self.save.enabled = False
+        self.cancel.enabled = False
         return super(_EditableMixin, self).SetFile(fileName)
 
     # Abstract edit methods
@@ -1113,8 +1113,8 @@ class _EditableMixin(_DetailsMixin):
         if not self.displayed_item: return
         self.edited = True
         if self.allowDetailsEdit:
-            self.save.enable()
-        self.cancel.enable()
+            self.save.enabled = True
+        self.cancel.enabled = True
 
     def DoSave(self): raise AbstractError
 
@@ -1606,8 +1606,8 @@ class INIDetailsPanel(_DetailsMixin, SashPanel):
 
     def _enable_buttons(self):
         isGameIni = bosh.iniInfos.ini in bosh.gameInis
-        self.removeButton.set_enabled(not isGameIni)
-        self.editButton.set_enabled(not isGameIni or self.current_ini_path.isfile())
+        self.removeButton.enabled = not isGameIni
+        self.editButton.enabled = not isGameIni or self.current_ini_path.isfile()
 
     def _OnRemove(self):
         """Called when the 'Remove' button is pressed."""
@@ -2266,7 +2266,7 @@ class InstallersList(balt.UIList):
                             u'Bash.')
             message += u'\n' + _(u'What would you like to do with them?')
             with balt.Dialog(self,_(u'Move or Copy?')) as dialog:
-                gCheckBox = checkBox(dialog,
+                gCheckBox = CheckBox(dialog,
                                      _(u"Don't show this in the future."))
                 VLayout(border=6, spacing=6, items=[
                     HLayout(spacing=6, default_border=6, items=[
@@ -2285,7 +2285,7 @@ class InstallersList(balt.UIList):
                 result = dialog.ShowModal() # buttons call dialog.EndModal(1/2)
                 if result == 1: action = 'MOVE'
                 elif result == 2: action = 'COPY'
-                if gCheckBox.GetValue():
+                if gCheckBox.checked:
                     settings['bash.installers.onDropFiles.action'] = action
         return action
 

@@ -38,10 +38,10 @@ from .patcher_dialog import PatchDialog, CBash_gui_patchers, PBash_gui_patchers
 from .. import bass, bosh, bolt, balt, bush, parsers, load_order
 from ..balt import ItemLink, Link, TextCtrl, StaticText, CheckLink, \
     EnabledLink, AppendableLink, TransLink, RadioLink, SeparatorLink, \
-    ChoiceLink, OneItemLink, Image, ListBoxes, checkBox
+    ChoiceLink, OneItemLink, Image, ListBoxes
 from ..gui.layouts import HLayout, VLayout, LayoutOptions, Spacer, Stretch, \
     RIGHT
-from ..gui import OkButton, CancelButton
+from ..gui import OkButton, CancelButton, CheckBox
 from ..bolt import GPath, SubProgress, formatDate
 from ..bosh import faces
 from ..cint import CBashApi, FormID
@@ -1977,16 +1977,16 @@ class Mod_Scripts_Export(_Mod_Export_Link):
             dialog.EndModal(1)
             bass.settings['bash.mods.export.deprefix'] = gdeprefix.GetValue().strip()
             bass.settings['bash.mods.export.skip'] = gskip.GetValue().strip()
-            bass.settings['bash.mods.export.skipcomments'] = gskipcomments.GetValue()
+            bass.settings['bash.mods.export.skipcomments'] = gskipcomments.checked
         dialog = balt.Dialog(Link.Frame, _(u'Export Scripts Options'),
                              size=(400, 180), resize=False)
         gskip = TextCtrl(dialog)
         gdeprefix = TextCtrl(dialog)
-        gskipcomments = checkBox(dialog, _(u'Filter Out Comments'),
-            checkbox_tip=_(u"If active doesn't export comments in the scripts"))
+        gskipcomments = CheckBox(dialog, _(u'Filter Out Comments'),
+                tooltip=_(u"If active doesn't export comments in the scripts"))
         gskip.SetValue(bass.settings['bash.mods.export.skip'])
         gdeprefix.SetValue(bass.settings['bash.mods.export.deprefix'])
-        gskipcomments.SetValue(bass.settings['bash.mods.export.skipcomments'])
+        gskipcomments.checked = bass.settings['bash.mods.export.skipcomments']
         VLayout(border=6, spacing=4, items=[
             StaticText(dialog, _(u"Skip prefix (leave blank to not skip any), non-case sensitive):"),
                        noAutoResize=True),

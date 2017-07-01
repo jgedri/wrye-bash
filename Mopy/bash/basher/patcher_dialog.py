@@ -154,10 +154,7 @@ class PatchDialog(balt.Dialog):
     #--Core -------------------------------
     def SetOkEnable(self):
         """Sets enable state for Ok button."""
-        for patcher in self.patchers:
-            if patcher.isEnabled:
-                return self.gExecute.enable()
-        self.gExecute.disable()
+        self.gExecute.enabled = any(p.isEnabled for p in self.patchers)
 
     def ShowPatcher(self,patcher):
         """Show patcher panel."""
@@ -436,14 +433,14 @@ class PatchDialog(balt.Dialog):
         for index,patcher in enumerate(self.patchers):
             self.gPatchers.Check(index,True)
             patcher.mass_select()
-        self.gExecute.enable()
+        self.gExecute.enabled = True
 
     def DeselectAll(self):
         """Deselect all patchers and entries in patchers with child entries."""
         for index,patcher in enumerate(self.patchers):
             self.gPatchers.Check(index,False)
             patcher.mass_select(select=False)
-        self.gExecute.disable()
+        self.gExecute.enabled = False
 
     #--GUI --------------------------------
     def OnSize(self,event):

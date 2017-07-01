@@ -28,11 +28,10 @@ from operator import itemgetter
 import wx
 # Internal
 from .. import bass, bosh, bush, balt, load_order, bolt, exception
-from ..balt import fill, StaticText, checkBox, \
-    Links, SeparatorLink, CheckLink, Link
+from ..balt import fill, StaticText, Links, SeparatorLink, CheckLink, Link
 from ..bolt import GPath
 from ..gui.layouts import HBoxedLayout, VLayout, LayoutOptions, Spacer, TOP
-from ..gui import Button
+from ..gui import Button, CheckBox
 from ..patcher import patch_files
 
 reCsvExt = re.compile(ur'\.csv$', re.I | re.U)
@@ -237,13 +236,13 @@ class _ListPatcherPanel(_PatcherPanel):
             side_button_layout = None
             self.SetItems(self.getAutoItems())
         else:
-            self.gAuto = checkBox(gConfigPanel, _(u'Automatic'),
-                                  onCheck=self.OnAutomatic,
+            self.gAuto = CheckBox(gConfigPanel, _(u'Automatic'),
+                                  on_toggle=self.OnAutomatic,
                                   checked=self.autoIsChecked)
             self.gAdd = Button(gConfigPanel, _(u'Add'), on_click=self.OnAdd)
             self.gRemove = Button(gConfigPanel, _(u'Remove'),
                                   on_click=self.OnRemove)
-            self.OnAutomatic()
+            self.OnAutomatic(self.autoIsChecked)
             side_button_layout = VLayout(spacing=4, items=[
                 self.gAuto, Spacer(4), self.gAdd, self.gRemove])
         #--Layout
@@ -310,11 +309,11 @@ class _ListPatcherPanel(_PatcherPanel):
         elif ensureEnabled:
             self._EnsurePatcherEnabled()
 
-    def OnAutomatic(self):
+    def OnAutomatic(self, is_checked):
         """Automatic checkbox changed."""
-        self.autoIsChecked = self.gAuto.IsChecked()
-        self.gAdd.set_enabled(not self.autoIsChecked)
-        self.gRemove.set_enabled(not self.autoIsChecked)
+        self.autoIsChecked = is_checked
+        self.gAdd.enabled = not self.autoIsChecked
+        self.gRemove.enabled = not self.autoIsChecked
         if self.autoIsChecked:
             self.SetItems(self.getAutoItems())
 
