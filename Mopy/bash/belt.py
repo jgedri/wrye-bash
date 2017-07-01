@@ -32,8 +32,9 @@ from ScriptParser import error
 import wx
 import wx.wizard as wiz     # wxPython wizard class
 import bosh, balt, bolt, bush
-from balt import VLayout, LayoutOptions, HBoxedLayout, Image, \
-    GridLayout, Stretch, set_event_hook, Events, HLayout
+from balt import Image, set_event_hook, Events
+from gui.layouts import VLayout, LayoutOptions, HBoxedLayout, \
+    GridLayout, Stretch, HLayout, CENTER, RIGHT, BOTTOM
 from env import get_file_version
 import StringIO
 import traceback
@@ -532,12 +533,12 @@ class PageVersions(PageInstaller):
                                      onCheck=self.OnCheck)
         VLayout(items=[
             Stretch(1),
-            (text_warning, LayoutOptions(h_align=balt.CENTER)),
+            (text_warning, LayoutOptions(h_align=CENTER)),
             Stretch(1),
             (versions_box, LayoutOptions(fill=True, weight=1)),
             Stretch(2),
-            (self.checkOk, LayoutOptions(h_align=balt.RIGHT,
-                                         v_align=balt.BOTTOM, border=5))
+            (self.checkOk, LayoutOptions(h_align=RIGHT,
+                                         v_align=BOTTOM, border=5))
         ]).apply_to(self)
         self._enableForward(False)
         self.Layout()

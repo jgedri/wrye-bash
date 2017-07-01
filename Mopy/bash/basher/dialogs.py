@@ -29,8 +29,9 @@ from .constants import colorInfo, settingDefaults, installercons
 from .. import bass, balt, bosh, bolt, bush, env
 from ..balt import Button, Link, colors, RoTextCtrl, checkBox, StaticText, \
     Image, bell, TextCtrl, tooltip, OkButton, CancelButton, ApplyButton, \
-    Resources, VLayout, HLayout, GridLayout, LayoutOptions, set_event_hook, \
-    Events, Stretch, ColorPicker
+    Resources, set_event_hook, Events, ColorPicker
+from ..gui.layouts import HLayout, VLayout, GridLayout, LayoutOptions, \
+    Stretch, RIGHT, BOTTOM, CENTER
 from ..bosh import faces
 
 class ColorDialog(balt.Dialog):
@@ -300,7 +301,7 @@ class ImportFaceDialog(balt.Dialog):
                  (self.statsCheck, self.statsText),
                  (self.classCheck, self.classText)]),
              (VLayout(spacing=4, items=[importButton, CancelButton(self)]),
-              LayoutOptions(h_align=balt.RIGHT, v_align=balt.BOTTOM)))
+              LayoutOptions(h_align=RIGHT, v_align=BOTTOM)))
         ]).apply_to(self)
 
     def EvtListBox(self,event):
@@ -376,7 +377,7 @@ class CreateNewProject(balt.Dialog):
             (HLayout(spacing=5, items=[
                 OkButton(self, onButClickEventful=self.OnClose),
                 CancelButton(self, onButClickEventful=self.OnCancel)]),
-             LayoutOptions(h_align=balt.CENTER))
+             LayoutOptions(h_align=CENTER))
         ]).apply_to(self)
         self.SetInitialSize()
         # Event Handlers

@@ -29,9 +29,9 @@ import wx
 # Internal
 from .. import bass, bosh, bush, balt, load_order, bolt, exception
 from ..balt import fill, StaticText, checkBox, Button, \
-    Links, SeparatorLink, CheckLink, Link, VLayout, \
-    HBoxedLayout, Spacer, LayoutOptions
+    Links, SeparatorLink, CheckLink, Link
 from ..bolt import GPath
+from ..gui.layouts import HBoxedLayout, VLayout, LayoutOptions, Spacer, TOP
 from ..patcher import patch_files
 
 reCsvExt = re.compile(ur'\.csv$', re.I | re.U)
@@ -249,7 +249,7 @@ class _ListPatcherPanel(_PatcherPanel):
         self.main_layout.add(
             (HBoxedLayout(gConfigPanel, title=self.__class__.listLabel, items=[
                 (self.gList, LayoutOptions(fill=True, weight=1)),
-                (side_button_layout, LayoutOptions(v_align=balt.TOP)),
+                (side_button_layout, LayoutOptions(v_align=TOP)),
                 (self._get_select_layout(), LayoutOptions(fill=True))]),
              LayoutOptions(fill=True, weight=1)))
         return gConfigPanel

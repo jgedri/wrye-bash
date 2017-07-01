@@ -30,8 +30,9 @@ import wx
 from .. import bass, balt, bosh, bolt, load_order
 from ..balt import TextCtrl, StaticText, Button, \
     RoTextCtrl, bell, Link, toggleButton, SaveButton, CancelButton, \
-    BaltFrame, Resources, HtmlCtrl, HLayout, VLayout, GridLayout, checkBox, \
-    LayoutOptions, Stretch, set_event_hook, Spacer
+    BaltFrame, Resources, HtmlCtrl, checkBox, set_event_hook
+from ..gui.layouts import HLayout, VLayout, GridLayout, LayoutOptions, \
+    Spacer, Stretch, CENTER
 from ..bolt import GPath
 from ..bosh import omods
 
@@ -433,7 +434,7 @@ class InstallerProject_OmodConfigDialog(BaltFrame):
         def _no_fill_text(txt):
             return StaticText(self, txt), LayoutOptions(fill=False)
         VLayout(default_fill=True, spacing=4, border=4, items=[
-            GridLayout(h_spacing=4, v_spacing=4, default_v_align=balt.CENTER,
+            GridLayout(h_spacing=4, v_spacing=4, default_v_align=CENTER,
                        stretch_cols=[1], default_fill=True, items=[
                 (_no_fill_text(_(u'Name:')), self.gName),
                 (_no_fill_text(_(u'Version:')), self.gVersion),

@@ -33,8 +33,8 @@ from . import BashFrame ##: drop this - decouple !
 from .. import bass, bosh, bolt, balt, env, load_order
 from ..balt import StaticText, Link, OkButton, SelectAllButton, CancelButton, \
     SaveAsButton, OpenButton, RevertToSavedButton, RevertButton, Resources, \
-    VLayout, HLayout, LayoutOptions, Stretch, set_event_hook, Events, \
-    HorizontalLine
+    set_event_hook, Events, HorizontalLine
+from ..gui.layouts import HLayout, VLayout, LayoutOptions, Stretch
 from ..bolt import SubProgress, GPath, Path
 from ..exception import BoltError, CancelError, FileEditError, \
     PluginsFullError, SkipError

@@ -81,11 +81,13 @@ from .. import balt
 from ..balt import CheckLink, EnabledLink, SeparatorLink, Link, \
     ChoiceLink, RoTextCtrl, staticBitmap, AppendableLink, ListBoxes, \
     SaveButton, CancelButton, INIListCtrl, DnDStatusBar, NotebookPanel, \
-    VLayout, HLayout, Stretch, LayoutOptions, Spacer, \
     BaltFrame, set_event_hook, Events
 from ..balt import checkBox, StaticText, spinCtrl, TextCtrl
 from ..balt import colors, images, Image, Resources
 from ..balt import Links, ItemLink
+
+from ..gui.layouts import HLayout, VLayout, LayoutOptions, Spacer, Stretch, \
+    RIGHT, TOP
 
 # Constants -------------------------------------------------------------------
 from .constants import colorInfo, settingDefaults, karmacons, installercons
@@ -1213,7 +1215,7 @@ class _SashDetailsPanel(_EditableMixinOnFileInfos, SashPanel):
             StaticText(self.masterPanel, _(u"Masters:")),
             (self.uilist, LayoutOptions(weight=1, fill=True)),
             (HLayout(spacing=4, items=[self.save, self.cancel]),
-             LayoutOptions(h_align=balt.RIGHT))
+             LayoutOptions(h_align=RIGHT))
         ]).apply_to(self.masterPanel)
 
     def ShowPanel(self, **kwargs):
@@ -2268,7 +2270,7 @@ class InstallersList(balt.UIList):
                                      _(u"Don't show this in the future."))
                 VLayout(border=6, spacing=6, items=[
                     HLayout(spacing=6, default_border=6, items=[
-                        (staticBitmap(dialog), LayoutOptions(v_align=balt.TOP)),
+                        (staticBitmap(dialog), LayoutOptions(v_align=TOP)),
                         (StaticText(dialog, message), LayoutOptions(fill=True))
                     ]),
                     Stretch(), Spacer(10), gCheckBox,
@@ -2278,7 +2280,7 @@ class InstallersList(balt.UIList):
                         balt.Button(dialog, label=_(u'Copy'),
                                     onButClick=lambda: dialog.EndModal(2)),
                         CancelButton(dialog)
-                     ]), LayoutOptions(h_align=balt.RIGHT))
+                     ]), LayoutOptions(h_align=RIGHT))
                 ]).apply_to(dialog)
                 result = dialog.ShowModal() # buttons call dialog.EndModal(1/2)
                 if result == 1: action = 'MOVE'
