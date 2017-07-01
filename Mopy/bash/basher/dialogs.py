@@ -27,11 +27,11 @@ from types import IntType, LongType
 from . import bEnableWizard, tabInfo, BashFrame
 from .constants import colorInfo, settingDefaults, installercons
 from .. import bass, balt, bosh, bolt, bush, env
-from ..balt import Button, Link, colors, RoTextCtrl, checkBox, StaticText, \
-    Image, bell, TextCtrl, tooltip, OkButton, CancelButton, ApplyButton, \
-    Resources, set_event_hook, Events, ColorPicker
+from ..balt import Link, colors, RoTextCtrl, checkBox, StaticText, Image, \
+    bell, TextCtrl, tooltip, Resources, set_event_hook, Events, ColorPicker
 from ..gui.layouts import HLayout, VLayout, GridLayout, LayoutOptions, \
     Stretch, RIGHT, BOTTOM, CENTER
+from ..gui import Button, ApplyButton, CancelButton, OkButton
 from ..bosh import faces
 
 class ColorDialog(balt.Dialog):
@@ -136,14 +136,15 @@ class ColorDialog(balt.Dialog):
             color = colors[color_key]
         default = bool(color == settingDefaults['bash.colors'][color_key])
         # Update the Buttons, ComboBox, and ColorPicker
-        self.apply.Enable(changed)
-        self.applyAll.Enable(anyChanged)
-        self.default.Enable(not default)
-        self.defaultAll.Enable(not allDefault)
+        self.apply.set_enabled(changed)
+        self.applyAll.set_enabled(anyChanged)
+        self.default.set_enabled(not default)
+        self.defaultAll.set_enabled(not allDefault)
         self.picker.set_color(color)
         self.comboBox.SetFocusFromKbd()
 
     def OnDefault(self,event):
+        # TODO(nycz): un-event this ok
         event.Skip()
         color_key = self.GetColorKey()
         newColor = settingDefaults['bash.colors'][color_key]
@@ -286,7 +287,7 @@ class ImportFaceDialog(balt.Dialog):
         self.classText  = StaticText(self,u'')
         #--Other
         importButton = Button(self, label=_(u'Import'),
-                              onButClick=self.DoImport, default=True)
+                              on_click=self.DoImport, default=True)
         self.picture = balt.Picture(self,350,210,scaling=2)
         GridLayout(border=4, stretch_cols=[0, 1], stretch_rows=[0], items=[
             # Row 1

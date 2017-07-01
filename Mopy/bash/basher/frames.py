@@ -28,11 +28,11 @@ from collections import OrderedDict
 
 import wx
 from .. import bass, balt, bosh, bolt, load_order
-from ..balt import TextCtrl, StaticText, Button, \
-    RoTextCtrl, bell, Link, toggleButton, SaveButton, CancelButton, \
-    BaltFrame, Resources, HtmlCtrl, checkBox, set_event_hook
+from ..balt import TextCtrl, StaticText, RoTextCtrl, bell, Link, \
+    toggleButton, BaltFrame, Resources, HtmlCtrl, checkBox, set_event_hook
 from ..gui.layouts import HLayout, VLayout, GridLayout, LayoutOptions, \
     Spacer, Stretch, CENTER
+from ..gui import Button, CancelButton, SaveButton
 from ..bolt import GPath
 from ..bosh import omods
 
@@ -67,16 +67,16 @@ class DocBrowser(BaltFrame):
                                       onSelect=self._do_select_mod)
         # Buttons
         self._set_btn = Button(main_window, _(u'Set Doc...'),
-                               onButClick=self._do_set)
+                               on_click=self._do_set)
         self._forget_btn = Button(main_window, _(u'Forget Doc...'),
-                                  onButClick=self._do_forget)
+                                  on_click=self._do_forget)
         self._rename_btn = Button(main_window, _(u'Rename Doc...'),
-                                  onButClick=self._do_rename)
+                                  on_click=self._do_rename)
         self._edit_btn = toggleButton(main_window, label=_(u'Edit Doc...'),
                                       onClickToggle=self._do_edit)
         self._open_btn = Button(main_window, _(u'Open Doc...'),
-                                onButClick=self._do_open,
-                                button_tip=_(u'Open doc in external editor.'))
+                                on_click=self._do_open,
+                                tooltip=_(u'Open doc in external editor.'))
         self._doc_name_box = RoTextCtrl(main_window, multiline=False)
         self._doc_ctrl = HtmlCtrl(main_window)
         self._prev_btn, self._next_btn = self._doc_ctrl.get_buttons()
@@ -147,7 +147,7 @@ class DocBrowser(BaltFrame):
         del self._db_doc_paths[self._mod_name]
         self.DoSave()
         for btn in (self._forget_btn, self._rename_btn):
-            btn.Disable()
+            btn.disable()
         self._doc_name_box.Clear()
         self._load_data(data=u'')
 
@@ -234,7 +234,7 @@ class DocBrowser(BaltFrame):
             for btn in self._buttons:
                 btn.Disable()
             return
-        self._set_btn.Enable(True)
+        self._set_btn.enable()
         self._mod_list.SetSelection(self._mod_list.FindString(mod_name.s))
         # Doc path
         doc_path = self._db_doc_paths.get(mod_name, GPath(u''))
@@ -323,7 +323,7 @@ class ModChecker(BaltFrame):
             elif type_ == 'check':
                 btn = checkBox(self, caption, onCheck=callback)
             elif type_ == 'click':
-                btn = Button(self, caption, onButClick=callback)
+                btn = Button(self, caption, on_click=callback)
             if setting_key is not None:
                 btn.SetValue(bass.settings.get(
                     'bash.modChecker.show{}'.format(setting_key), setting_value))
@@ -446,8 +446,8 @@ class InstallerProject_OmodConfigDialog(BaltFrame):
             (self.gAbstract, LayoutOptions(weight=1)),
             HLayout(spacing=4, items=[
                 Stretch(),
-                SaveButton(self, onButClick=self.DoSave, default=True),
-                CancelButton(self, onButClick=self.OnCloseWindow)])
+                SaveButton(self, on_click=self.DoSave, default=True),
+                CancelButton(self, on_click=self.OnCloseWindow)])
         ]).apply_to(self)
         self.SetSize((350,400))
 

@@ -80,14 +80,14 @@ startupinfo = bolt.startupinfo
 from .. import balt
 from ..balt import CheckLink, EnabledLink, SeparatorLink, Link, \
     ChoiceLink, RoTextCtrl, staticBitmap, AppendableLink, ListBoxes, \
-    SaveButton, CancelButton, INIListCtrl, DnDStatusBar, NotebookPanel, \
-    BaltFrame, set_event_hook, Events
+    INIListCtrl, DnDStatusBar, NotebookPanel, BaltFrame, set_event_hook, Events
 from ..balt import checkBox, StaticText, spinCtrl, TextCtrl
 from ..balt import colors, images, Image, Resources
 from ..balt import Links, ItemLink
 
 from ..gui.layouts import HLayout, VLayout, LayoutOptions, Spacer, Stretch, \
     RIGHT, TOP
+from ..gui import Button, CancelButton, SaveButton
 
 # Constants -------------------------------------------------------------------
 from .constants import colorInfo, settingDefaults, karmacons, installercons
@@ -1092,17 +1092,17 @@ class _EditableMixin(_DetailsMixin):
     def __init__(self, buttonsParent):
         self.edited = False
         #--Save/Cancel
-        self.save = SaveButton(buttonsParent, onButClick=self.DoSave)
-        self.cancel = CancelButton(buttonsParent, onButClick=self.DoCancel)
-        self.save.Disable()
-        self.cancel.Disable()
+        self.save = SaveButton(buttonsParent, on_click=self.DoSave)
+        self.cancel = CancelButton(buttonsParent, on_click=self.DoCancel)
+        self.save.disable()
+        self.cancel.disable()
 
     # Details panel API
     def SetFile(self, fileName='SAME'):
         #--Edit State
         self.edited = False
-        self.save.Disable()
-        self.cancel.Disable()
+        self.save.disable()
+        self.cancel.disable()
         return super(_EditableMixin, self).SetFile(fileName)
 
     # Abstract edit methods
@@ -1113,8 +1113,8 @@ class _EditableMixin(_DetailsMixin):
         if not self.displayed_item: return
         self.edited = True
         if self.allowDetailsEdit:
-            self.save.Enable()
-        self.cancel.Enable()
+            self.save.enable()
+        self.cancel.enable()
 
     def DoSave(self): raise AbstractError
 
@@ -1548,10 +1548,10 @@ class INIDetailsPanel(_DetailsMixin, SashPanel):
         self._ini_detail = None
         left,right = self.left, self.right
         #--Remove from list button
-        self.removeButton = balt.Button(right, _(u'Remove'),
-                                        onButClick=self._OnRemove)
+        self.removeButton = Button(right, _(u'Remove'),
+                                   on_click=self._OnRemove)
         #--Edit button
-        self.editButton = balt.Button(right, _(u'Edit...'), onButClick=lambda:
+        self.editButton = Button(right, _(u'Edit...'), on_click=lambda:
                                       self.current_ini_path.start())
         #--Ini file
         self.iniContents = TargetINILineCtrl(right)
@@ -1606,8 +1606,8 @@ class INIDetailsPanel(_DetailsMixin, SashPanel):
 
     def _enable_buttons(self):
         isGameIni = bosh.iniInfos.ini in bosh.gameInis
-        self.removeButton.Enable(not isGameIni)
-        self.editButton.Enable(not isGameIni or self.current_ini_path.isfile())
+        self.removeButton.set_enabled(not isGameIni)
+        self.editButton.set_enabled(not isGameIni or self.current_ini_path.isfile())
 
     def _OnRemove(self):
         """Called when the 'Remove' button is pressed."""
@@ -2275,10 +2275,10 @@ class InstallersList(balt.UIList):
                     ]),
                     Stretch(), Spacer(10), gCheckBox,
                     (HLayout(spacing=4, items=[
-                        balt.Button(dialog, label=_(u'Move'),
-                                    onButClick=lambda: dialog.EndModal(1)),
-                        balt.Button(dialog, label=_(u'Copy'),
-                                    onButClick=lambda: dialog.EndModal(2)),
+                        Button(dialog, label=_(u'Move'),
+                               on_click=lambda: dialog.EndModal(1)),
+                        Button(dialog, label=_(u'Copy'),
+                               on_click=lambda: dialog.EndModal(2)),
                         CancelButton(dialog)
                      ]), LayoutOptions(h_align=RIGHT))
                 ]).apply_to(dialog)

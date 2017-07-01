@@ -50,6 +50,7 @@ import wx.wizard as wiz
 #--gui
 from gui.layouts import HLayout, VLayout, HBoxedLayout, LayoutOptions, \
     Stretch, TOP, RIGHT
+import gui
 #--wx webview, may not be present on all systems
 try:
     # raise ImportError
@@ -436,47 +437,9 @@ def bitmapButton(parent, bitmap, button_tip=None, pos=defPos, size=defSize,
     if button_tip: gButton.SetToolTip(tooltip(button_tip))
     return gButton
 
-class Button(wx.Button):
-    _id = defId
-    label = u''
-
-    def __init__(self, parent, label=u'', pos=defPos, size=defSize, style=0,
-                 val=defVal, name='button', onButClick=None,
-                 onButClickEventful=None, button_tip=None, default=False):
-        """Create a button and bind its click function.
-        :param onButClick: a no args function to execute on button click
-        :param onButClickEventful: a function accepting as parameter the
-        EVT_BUTTON - messing with events outside balt is discouraged
-        """
-        if  not label and self.__class__.label: label = self.__class__.label
-        wx.Button.__init__(self, parent, self.__class__._id,
-                           label, pos, size, style, val, name)
-        if onButClick and onButClickEventful:
-            raise BoltError('Both onButClick and onButClickEventful specified')
-        if onButClick: self.Bind(wx.EVT_BUTTON, lambda __event: onButClick())
-        if onButClickEventful: self.Bind(wx.EVT_BUTTON, onButClickEventful)
-        if button_tip: self.SetToolTip(tooltip(button_tip))
-        if default: self.SetDefault()
-
-class OkButton(Button): _id = wx.ID_OK
-class CancelButton(Button):
-    _id = wx.ID_CANCEL
-    label = _(u'Cancel')
-
 def ok_and_cancel_group(parent, on_ok=None):
-    return HLayout(spacing=4, items=[OkButton(parent, onButClick=on_ok),
-                                     CancelButton(parent)])
-
-class SaveButton(Button):
-    _id = wx.ID_SAVE
-    label = _(u'Save')
-
-class SaveAsButton(Button): _id = wx.ID_SAVEAS
-class RevertButton(Button): _id = wx.ID_SAVE
-class RevertToSavedButton(Button): _id = wx.ID_REVERT_TO_SAVED
-class OpenButton(Button): _id = wx.ID_OPEN
-class SelectAllButton(Button): _id = wx.ID_SELECTALL
-class ApplyButton(Button): _id = wx.ID_APPLY
+    return HLayout(spacing=4, items=[gui.OkButton(parent, on_click=on_ok),
+                                     gui.CancelButton(parent)])
 
 def toggleButton(parent, label=u'', pos=defPos, size=defSize, style=0,
                  val=defVal, name='button', onClickToggle=None,
@@ -969,7 +932,7 @@ class Log(_Log):
         #--Layout
         VLayout(border=2, items=[
             (txtCtrl, LayoutOptions(fill=True, weight=1, border=2)),
-            (OkButton(self.window, onButClick=self.window.Close, default=True),
+            (gui.OkButton(self.window, on_click=self.window.Close, default=True),
              LayoutOptions(h_align=RIGHT, border=2))
         ]).apply_to(self.window)
         self.ShowLog()
@@ -998,7 +961,7 @@ class WryeLog(_Log):
         self._html_ctrl = HtmlCtrl(self.window)
         self._html_ctrl.try_load_html(file_path=logPath)
         #--Buttons
-        gOkButton = OkButton(self.window, onButClick=self.window.Close, default=True)
+        gOkButton = gui.OkButton(self.window, on_click=self.window.Close, default=True)
         if not asDialog:
             self.window.SetBackgroundColour(gOkButton.GetBackgroundColour())
         #--Layout
@@ -1149,8 +1112,8 @@ class ListEditor(Dialog):
             buttonSet.append((True, k, v))
         if sum(bool(x[0]) for x in buttonSet):
             buttons = VLayout(spacing=4, items=[
-                Button(self, (flag == True and defLabel) or flag,
-                       onButClick=func)
+                gui.Button(self, (flag == True and defLabel) or flag,
+                           on_click=func)
                 for flag, defLabel, func in buttonSet if flag])
         else:
             buttons = None
@@ -2881,8 +2844,8 @@ class ListBoxes(Dialog):
                                              items=[checksCtrl]),
                         LayoutOptions(fill=True, weight=1)))
         layout.add((HLayout(spacing=5, items=[
-                OkButton(self, label=bOk, default=True),
-                (CancelButton(self, label=bCancel) if canCancel else None)]
+                gui.OkButton(self, label=bOk, default=True),
+                (gui.CancelButton(self, label=bCancel) if canCancel else None)]
                             ), LayoutOptions(h_align=RIGHT)))
         layout.apply_to(self)
         #make sure that minimum size is at least the size of title

@@ -28,10 +28,11 @@ from operator import itemgetter
 import wx
 # Internal
 from .. import bass, bosh, bush, balt, load_order, bolt, exception
-from ..balt import fill, StaticText, checkBox, Button, \
+from ..balt import fill, StaticText, checkBox, \
     Links, SeparatorLink, CheckLink, Link
 from ..bolt import GPath
 from ..gui.layouts import HBoxedLayout, VLayout, LayoutOptions, Spacer, TOP
+from ..gui import Button
 from ..patcher import patch_files
 
 reCsvExt = re.compile(ur'\.csv$', re.I | re.U)
@@ -239,9 +240,9 @@ class _ListPatcherPanel(_PatcherPanel):
             self.gAuto = checkBox(gConfigPanel, _(u'Automatic'),
                                   onCheck=self.OnAutomatic,
                                   checked=self.autoIsChecked)
-            self.gAdd = Button(gConfigPanel, _(u'Add'), onButClick=self.OnAdd)
+            self.gAdd = Button(gConfigPanel, _(u'Add'), on_click=self.OnAdd)
             self.gRemove = Button(gConfigPanel, _(u'Remove'),
-                                  onButClick=self.OnRemove)
+                                  on_click=self.OnRemove)
             self.OnAutomatic()
             side_button_layout = VLayout(spacing=4, items=[
                 self.gAuto, Spacer(4), self.gAdd, self.gRemove])
@@ -257,9 +258,9 @@ class _ListPatcherPanel(_PatcherPanel):
     def _get_select_layout(self):
         if not self.selectCommands: return None
         self.gSelectAll = Button(self.gConfigPanel, _(u'Select All'),
-                                 onButClick=self.SelectAll)
+                                 on_click=self.SelectAll)
         self.gDeselectAll = Button(self.gConfigPanel, _(u'Deselect All'),
-                                   onButClick=self.DeselectAll)
+                                   on_click=self.DeselectAll)
         return VLayout(spacing=4, items=[Spacer(4), self.gSelectAll,
                                          self.gDeselectAll])
 
@@ -312,8 +313,8 @@ class _ListPatcherPanel(_PatcherPanel):
     def OnAutomatic(self):
         """Automatic checkbox changed."""
         self.autoIsChecked = self.gAuto.IsChecked()
-        self.gAdd.Enable(not self.autoIsChecked)
-        self.gRemove.Enable(not self.autoIsChecked)
+        self.gAdd.set_enabled(not self.autoIsChecked)
+        self.gRemove.set_enabled(not self.autoIsChecked)
         if self.autoIsChecked:
             self.SetItems(self.getAutoItems())
 
@@ -501,9 +502,9 @@ class _TweakPatcherPanel(_ChoiceMenuMixin, _PatcherPanel):
     def _get_tweak_select_layout(self, ):
         if self.selectCommands:
             self.gTweakSelectAll = Button(self.gConfigPanel,
-                _(u'Select All'), onButClick=self.TweakSelectAll)
+                                          _(u'Select All'), on_click=self.TweakSelectAll)
             self.gTweakDeselectAll = Button(self.gConfigPanel,
-                _(u'Deselect All'), onButClick=self.TweakDeselectAll)
+                                            _(u'Deselect All'), on_click=self.TweakDeselectAll)
             tweak_select_layout = VLayout(spacing=4, items=[
                 Spacer(4), self.gTweakSelectAll, self.gTweakDeselectAll])
         else: tweak_select_layout = None

@@ -22,6 +22,8 @@
 #
 # =============================================================================
 
+from . import Widget as _Widget
+
 import wx as _wx
 
 
@@ -114,6 +116,8 @@ class _Layout(object):
             item, options = item
         if isinstance(item, _Layout):
             item = item._sizer
+        elif isinstance(item, _Widget):
+            item = item._native_widget
         border = self.default_border
         fill_ = self.default_fill
         h_align = self.default_h_align
