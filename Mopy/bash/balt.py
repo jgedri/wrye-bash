@@ -358,57 +358,6 @@ def HorizontalLine(parent):
     """Returns a simple horizontal graphical line."""
     return wx.StaticLine(parent)
 
-class TextCtrl(wx.TextCtrl):
-    """wx.TextCtrl with automatic tooltip if text goes past the width of the
-    control."""
-
-    def __init__(self, parent, value=u'', size=defSize, style=0,
-                 multiline=False, autotooltip=True, name=wx.TextCtrlNameStr,
-                 maxChars=None, onKillFocus=None, onText=None):
-        if multiline: style |= wx.TE_MULTILINE ##: would it harm to have them all multiline ?
-        wx.TextCtrl.__init__(self, parent, defId, value, size=size, style=style,
-                             name=name)
-        #if maxChars: self.SetMaxLength(maxChars)
-        if autotooltip:
-            self.Bind(wx.EVT_TEXT, self.OnTextChange)
-            self.Bind(wx.EVT_SIZE, self.OnSizeChange)
-        # event handlers must call event.Skip()
-        if onKillFocus:
-            self.Bind(wx.EVT_KILL_FOCUS, lambda __event: onKillFocus())
-        if onText: self.Bind(wx.EVT_TEXT, onText)
-
-    def UpdateToolTip(self, text):
-        if self.GetClientSize()[0] < self.GetTextExtent(text)[0]:
-            self.SetToolTip(tooltip(text))
-        else:
-            self.SetToolTip(tooltip(u''))
-
-    def OnTextChange(self,event):
-        self.UpdateToolTip(event.GetString())
-        event.Skip()
-    def OnSizeChange(self, event):
-        self.UpdateToolTip(self.GetValue())
-        event.Skip()
-
-class RoTextCtrl(TextCtrl):
-    """Set some styles to a read only textCtrl.
-
-    Name intentionally ugly - tmp class to accommodate current code - do not
-    use - do not imitate my fishing in kwargs."""
-    def __init__(self, *args, **kwargs):
-        """"To accommodate for common text boxes in Bash code - borderline"""
-        # set some styles
-        style = kwargs.get('style', 0)
-        style |= wx.TE_READONLY
-        special = kwargs.pop('special', False) # used in places
-        if special: style |= wx.TE_RICH2 | wx.SUNKEN_BORDER
-        if kwargs.pop('noborder', False): style |= wx.NO_BORDER
-        if kwargs.pop('hscroll', False): style |= wx.HSCROLL
-        kwargs['style'] = style
-        # override default 'multiline' parameter value, 'False', with 'True'
-        kwargs['multiline'] = kwargs.pop('multiline', True)
-        super(RoTextCtrl, self).__init__(*args, **kwargs)
-
 class ComboBox(wx.ComboBox):
     """wx.ComboBox with automatic tooltip if text is wider than width of control."""
     def __init__(self, *args, **kwdargs):
@@ -753,15 +702,14 @@ class HtmlCtrl(wx.Window):
     def __init__(self, parent):
         super(HtmlCtrl, self).__init__(parent)
         # init the fallback/plaintext widget
-        self._text_ctrl = TextCtrl(self, multiline=True, autotooltip=False)
-        self._text_ctrl.SetEditable(False)
+        self._text_ctrl = gui.TextArea(self,editable=False,auto_tooltip=False)
         back = forward = None
         items = [self._text_ctrl]
         if _wx_html2:
             self._html_ctrl = _wx_html2.WebView.New(self,
                                            style=wx.NO_FULL_REPAINT_ON_RESIZE)
             items.append(self._html_ctrl)
-            self._text_ctrl.Disable()
+            self._text_ctrl.enabled = False
             back = self._html_ctrl.GoBack
             forward = self._html_ctrl.GoForward
         self.container = VLayout(default_weight=4, default_fill=True,
@@ -782,44 +730,41 @@ class HtmlCtrl(wx.Window):
 
     @property
     def text(self):
-        return self._text_ctrl.GetValue()
+        return self._text_ctrl.text
 
     @text.setter
     def text(self, text_):
-        self._text_ctrl.SetValue(text_)
+        self._text_ctrl.text = text_
 
     def load_text(self, text_):
-        self._text_ctrl.SetValue(text_)
-        self._text_ctrl.SetModified(False)
+        self._text_ctrl.text = text_
+        self._text_ctrl.modified = False
         self.switch_to_text()
 
     def is_text_modified(self):
-        return self._text_ctrl.IsModified()
+        return self._text_ctrl.modified
 
     def set_text_modified(self, modified):
-        if modified:
-            self._text_ctrl.MarkDirty()
-        else:
-            self._text_ctrl.DiscardEdits()
+        self._text_ctrl.modified = modified
 
     def set_text_editable(self, editable):
         # type: (bool) -> None
-        self._text_ctrl.SetEditable(editable)
+        self._text_ctrl.editable = editable
 
     def switch_to_html(self):
         if not _wx_html2: return
         self._html_ctrl.Show()
-        self._text_ctrl.Hide()
+        self._text_ctrl.visible = False
         self._html_ctrl.Enable()
-        self._text_ctrl.Disable()
+        self._text_ctrl.enabled = False
         self.Layout()
 
     def switch_to_text(self):
         if not _wx_html2: return
         self._html_ctrl.Hide()
-        self._text_ctrl.Show()
+        self._text_ctrl.visible = True
         self._html_ctrl.Disable()
-        self._text_ctrl.Enable()
+        self._text_ctrl.enabled = True
         self.Layout()
 
     def get_buttons(self):
@@ -899,15 +844,16 @@ class Log(_Log):
                                   log_icons)
         self.window.SetBackgroundColour(wx.NullColour) #--Bug workaround to ensure that default colour is being used.
         #--Text
-        txtCtrl = RoTextCtrl(self.window, logText, special=True, autotooltip=False)
-        txtCtrl.SetValue(logText)
+        txtCtrl = gui.TextArea(self.window, text=logText, auto_tooltip=False)
+                          # special=True) SUNKEN_BORDER and TE_RICH2
+        # TODO(nycz): GUI fixed width font
         if fixedFont:
             fixedFont = wx.SystemSettings_GetFont(wx.SYS_ANSI_FIXED_FONT )
             fixedFont.SetPointSize(8)
             fixedStyle = wx.TextAttr()
             #fixedStyle.SetFlags(0x4|0x80)
             fixedStyle.SetFont(fixedFont)
-            txtCtrl.SetStyle(0,txtCtrl.GetLastPosition(),fixedStyle)
+            # txtCtrl.SetStyle(0,txtCtrl.GetLastPosition(),fixedStyle)
         #--Layout
         VLayout(border=2, items=[
             (txtCtrl, LayoutOptions(fill=True, weight=1, border=2)),
@@ -942,7 +888,7 @@ class WryeLog(_Log):
         #--Buttons
         gOkButton = gui.OkButton(self.window, on_click=self.window.Close, default=True)
         if not asDialog:
-            self.window.SetBackgroundColour(gOkButton.GetBackgroundColour())
+            self.window.SetBackgroundColour(gOkButton.background_color)
         #--Layout
         VLayout(border=2, default_fill=True, items=[
             (self._html_ctrl, LayoutOptions(weight=1)),
@@ -1070,15 +1016,13 @@ class ListEditor(Dialog):
         self.listBox = listBox(self, choices=self._list_items)
         self.listBox.SetSizeHints(125,150)
         #--Infobox
+        self.gInfoBox = None # type: gui.TextArea
         if data.showInfo:
-            self.gInfoBox = TextCtrl(self,size=(130,-1),
-                style=(self._listEditorData.infoReadOnly*wx.TE_READONLY) |
-                      wx.TE_MULTILINE | wx.SUNKEN_BORDER)
-            if not self._listEditorData.infoReadOnly:
-                self.gInfoBox.Bind(wx.EVT_TEXT,
-                                   lambda __event: self.OnInfoEdit())
-        else:
-            self.gInfoBox = None
+            editable = not self._listEditorData.infoReadOnly
+            callback = self.OnInfoEdit if editable else None
+            self.gInfoBox = gui.TextArea(self, editable=editable,
+                                         on_text_change=callback)
+            # TODO(nycz): GUI size=(130, -1), SUNKEN_BORDER
         #--Buttons
         buttonSet = [
             (data.showAdd,    _(u'Add'),    self.DoAdd),
@@ -1157,8 +1101,8 @@ class ListEditor(Dialog):
         del self._list_items[itemDex]
         self.listBox.Delete(itemDex)
         if self.gInfoBox:
-            self.gInfoBox.DiscardEdits()
-            self.gInfoBox.SetValue(u'')
+            self.gInfoBox.modified = False
+            self.gInfoBox.text = u''
 
     #--Show Info
     def OnInfoEdit(self):
@@ -1166,8 +1110,8 @@ class ListEditor(Dialog):
         selections = self.listBox.GetSelections()
         if not selections: return bell()
         item = self._list_items[selections[0]]
-        if self.gInfoBox.IsModified():
-            self._listEditorData.setInfo(item,self.gInfoBox.GetValue())
+        if self.gInfoBox.modified:
+            self._listEditorData.setInfo(item, self.gInfoBox.text)
 
     #--Save/Cancel
     def DoSave(self):

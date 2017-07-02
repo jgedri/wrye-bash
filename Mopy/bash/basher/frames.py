@@ -28,11 +28,12 @@ from collections import OrderedDict
 
 import wx
 from .. import bass, balt, bosh, bolt, load_order
-from ..balt import TextCtrl, StaticText, RoTextCtrl, bell, Link, \
-    BaltFrame, Resources, HtmlCtrl, set_event_hook
+from ..balt import StaticText, bell, Link, BaltFrame, Resources, HtmlCtrl, \
+    set_event_hook
 from ..gui.layouts import HLayout, VLayout, GridLayout, LayoutOptions, \
     Spacer, Stretch, CENTER
-from ..gui import Button, CancelButton, SaveButton, ToggleButton, CheckBox
+from ..gui import Button, CancelButton, SaveButton, ToggleButton, CheckBox, \
+    TextField, TextArea
 from ..bolt import GPath
 from ..bosh import omods
 
@@ -60,7 +61,7 @@ class DocBrowser(BaltFrame):
         mod_list_window = wx.Panel(root_window)
         main_window = wx.Panel(root_window)
         # Mod Name
-        self._mod_name_box = RoTextCtrl(mod_list_window, multiline=False)
+        self._mod_name_box = TextField(mod_list_window, editable=False)
         self._mod_list = balt.listBox(mod_list_window,
                                       choices=sorted(x.s for x in self._db_doc_paths.keys()),
                                       isSort=True,
@@ -77,7 +78,7 @@ class DocBrowser(BaltFrame):
         self._open_btn = Button(main_window, _(u'Open Doc...'),
                                 on_click=self._do_open,
                                 tooltip=_(u'Open doc in external editor.'))
-        self._doc_name_box = RoTextCtrl(main_window, multiline=False)
+        self._doc_name_box = TextField(main_window, editable=False)
         self._doc_ctrl = HtmlCtrl(main_window)
         self._prev_btn, self._next_btn = self._doc_ctrl.get_buttons()
         self._buttons = [self._set_btn, self._forget_btn, self._rename_btn,
@@ -147,7 +148,7 @@ class DocBrowser(BaltFrame):
         self.DoSave()
         for btn in (self._forget_btn, self._rename_btn):
             btn.enabled = False
-        self._doc_name_box.Clear()
+        self._doc_name_box.text = u''
         self._load_data(data=u'')
 
     def _do_select_mod(self, event):
@@ -189,7 +190,7 @@ class DocBrowser(BaltFrame):
             else: new_html.remove()
         #--Remember change
         self._db_doc_paths[self._mod_name] = dest_path
-        self._doc_name_box.SetValue(dest_path.stail)
+        self._doc_name_box.text = dest_path.stail
 
     def DoSave(self):
         """Saves doc, if necessary."""
@@ -227,7 +228,7 @@ class DocBrowser(BaltFrame):
         self._doc_ctrl.set_text_editable(False)
         mod_name = GPath(mod_name)
         self._mod_name = mod_name
-        self._mod_name_box.SetValue(mod_name.s)
+        self._mod_name_box.text = mod_name.s
         if not mod_name:
             self._load_data(data=u'')
             for btn in self._buttons:
@@ -237,7 +238,7 @@ class DocBrowser(BaltFrame):
         self._mod_list.SetSelection(self._mod_list.FindString(mod_name.s))
         # Doc path
         doc_path = self._db_doc_paths.get(mod_name, GPath(u''))
-        self._doc_name_box.SetValue(doc_path.stail)
+        self._doc_name_box.text = doc_path.stail
         for btn in (self._forget_btn, self._rename_btn, self._edit_btn,
                     self._open_btn):
             btn.enabled = bool(doc_path)
@@ -425,14 +426,14 @@ class InstallerProject_OmodConfigDialog(BaltFrame):
             style=wx.RESIZE_BORDER | wx.CAPTION | wx.CLIP_CHILDREN |
                   wx.TAB_TRAVERSAL)
         #--Fields
-        self.gName = TextCtrl(self, config.name, maxChars=100)
-        self.gVersion = TextCtrl(self, u'%d.%02d' % (
-            config.vMajor, config.vMinor), maxChars=32)
-        self.gWebsite = TextCtrl(self, config.website, maxChars=512)
-        self.gAuthor = TextCtrl(self, config.author, maxChars=512)
-        self.gEmail = TextCtrl(self, config.email, maxChars=512)
-        self.gAbstract = TextCtrl(self, config.abstract, multiline=True,
-                                  maxChars=4 * 1024)
+        self.gName = TextField(self, text=config.name, max_length=100)
+        self.gVersion = TextField(self, u'{:d}.{:02d}'.format(
+            config.vMajor, config.vMinor), max_length=32)
+        self.gWebsite = TextField(self, config.website, max_length=512)
+        self.gAuthor = TextField(self, config.author, max_length=512)
+        self.gEmail = TextField(self, text=config.email, max_length=512)
+        self.gAbstract = TextArea(self, text=config.abstract)
+                                  # maxChars=4 * 1024)
         #--Layout
         def _no_fill_text(txt):
             return StaticText(self, txt), LayoutOptions(fill=False)
@@ -458,14 +459,14 @@ class InstallerProject_OmodConfigDialog(BaltFrame):
         """Handle save button."""
         config = self.config
         #--Text fields
-        config.name = self.gName.GetValue().strip()
-        config.website = self.gWebsite.GetValue().strip()
-        config.author = self.gAuthor.GetValue().strip()
-        config.email = self.gEmail.GetValue().strip()
-        config.abstract = self.gAbstract.GetValue().strip()
+        config.name = self.gName.text.strip()
+        config.website = self.gWebsite.text.strip()
+        config.author = self.gAuthor.text.strip()
+        config.email = self.gEmail.text.strip()
+        config.abstract = self.gAbstract.text.strip()
         #--Version
         maVersion = re.match(ur'(\d+)\.(\d+)',
-                             self.gVersion.GetValue().strip(), flags=re.U)
+                             self.gVersion.text.strip(), flags=re.U)
         if maVersion:
             config.vMajor,config.vMinor = map(int,maVersion.groups())
         else:

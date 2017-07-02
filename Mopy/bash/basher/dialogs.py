@@ -27,11 +27,12 @@ from types import IntType, LongType
 from . import bEnableWizard, tabInfo, BashFrame
 from .constants import colorInfo, settingDefaults, installercons
 from .. import bass, balt, bosh, bolt, bush, env
-from ..balt import Link, colors, RoTextCtrl, StaticText, Image, \
-    bell, TextCtrl, tooltip, Resources, set_event_hook, Events, ColorPicker
+from ..balt import Link, colors, StaticText, Image, \
+    bell, Resources, set_event_hook, Events, ColorPicker
 from ..gui.layouts import HLayout, VLayout, GridLayout, LayoutOptions, \
     Stretch, RIGHT, BOTTOM, CENTER
-from ..gui import Button, ApplyButton, CancelButton, OkButton, CheckBox
+from ..gui import Button, ApplyButton, CancelButton, OkButton, CheckBox, \
+    TextArea, TextField
 from ..bosh import faces
 
 class ColorDialog(balt.Dialog):
@@ -64,7 +65,7 @@ class ColorDialog(balt.Dialog):
         self.picker = ColorPicker(self, colors[choiceKey])
         #--Description
         help_ = colorInfo[choiceKey][1]
-        self.textCtrl = RoTextCtrl(self, help_)
+        self.textCtrl = TextArea(self, text=help_, editable=False)
         #--Buttons
         self.default = Button(self, _(u'Default'),
                               onButClickEventful=self.OnDefault)
@@ -244,8 +245,8 @@ class ColorDialog(balt.Dialog):
         event.Skip()
         self.UpdateUIButtons()
         color_key = self.GetColorKey()
-        help = colorInfo[color_key][1]
-        self.textCtrl.SetValue(help)
+        description = colorInfo[color_key][1]
+        self.textCtrl.text = description
 
     def OnColorPicker(self,event):
         event.Skip()
@@ -353,8 +354,8 @@ class CreateNewProject(balt.Dialog):
         self.existingProjects = [x for x in bass.dirs['installers'].list() if bass.dirs['installers'].join(x).isdir()]
 
         #--Attributes
-        self.textName = TextCtrl(self, _(u'New Project Name-#####'),
-                                 onText=self.OnCheckProjectsColorTextCtrl)
+        self.textName = TextField(self, _(u'New Project Name-#####'),
+                                  on_text_change=self.OnCheckProjectsColorTextCtrl)
         self.checkEsp = CheckBox(self, _(u'Blank.esp'),
                                  on_toggle=self.OnCheckBoxChange, checked=True)
         self.checkEspMasterless = CheckBox(self, _(u'Blank Masterless.esp'),
@@ -389,14 +390,13 @@ class CreateNewProject(balt.Dialog):
         self.OnCheckBoxChange()
 
     def OnCheckProjectsColorTextCtrl(self,event):
-        projectName = bolt.GPath(self.textName.GetValue())
+        projectName = bolt.GPath(self.textName.text)
         if projectName in self.existingProjects: #Fill this in. Compare this with the self.existingprojects list
-            self.textName.SetBackgroundColour('#FF0000')
-            self.textName.SetToolTip(tooltip(_(u'There is already a project with that name!')))
+            self.textName.background_color = '#FF0000'
+            self.textName.tooltip = _(u'There is already a project with that name!')
         else:
-            self.textName.SetBackgroundColour('#FFFFFF')
-            self.textName.SetToolTip(None)
-        self.textName.Refresh()
+            self.textName.background_color = '#FFFFFF'
+            self.textName.tooltip = None
         event.Skip()
 
     def OnCheckBoxChange(self, is_checked=None):
@@ -417,7 +417,7 @@ class CreateNewProject(balt.Dialog):
 
     def OnClose(self, event):
         """ Create the New Project and add user specified extras. """
-        projectName = bolt.GPath(self.textName.GetValue().strip())
+        projectName = bolt.GPath(self.textName.text.strip())
         projectDir = bass.dirs['installers'].join(projectName)
 
         if projectDir.exists():

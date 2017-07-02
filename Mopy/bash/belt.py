@@ -35,7 +35,7 @@ import bosh, balt, bolt, bush
 from balt import Image, set_event_hook, Events
 from gui.layouts import VLayout, LayoutOptions, HBoxedLayout, \
     GridLayout, Stretch, HLayout, CENTER, RIGHT, BOTTOM
-from gui import CheckBox
+from gui import CheckBox, TextArea
 from env import get_file_version
 import StringIO
 import traceback
@@ -220,8 +220,8 @@ class PageError(PageInstaller):
         #Layout stuff
         VLayout(spacing=5, items=[
             balt.StaticText(self, label=title),
-            (balt.RoTextCtrl(self, errorMsg, autotooltip=False),
-                        LayoutOptions(weight=1, fill=True))
+            (TextArea(self, editable=False, text=errorMsg, auto_tooltip=False),
+             LayoutOptions(weight=1, fill=True))
         ]).apply_to(self)
         self.Layout()
 
@@ -246,7 +246,7 @@ class PageSelect(PageInstaller):
         self.index = None
         self.TitleDesc = balt.StaticText(self, desc)
         self.TitleDesc.Wrap(parent.GetPageSize()[0]-10)
-        self.textItem = balt.RoTextCtrl(self, autotooltip=False)
+        self.textItem = TextArea(self, editable=False, auto_tooltip=False)
         self.bmpItem = balt.Picture(self,0,0,background=None)
         list_box = partial(balt.listBox, self, choices=listItems,
                            isHScroll=True, onSelect=self.OnSelect)
@@ -294,7 +294,7 @@ class PageSelect(PageInstaller):
     def Selection(self, index):
         self._enableForward(True)
         self.index = index
-        self.textItem.SetValue(self.descs[index])
+        self.textItem.text = self.descs[index]
         # Don't want the bitmap to resize until we call self.Layout()
         self.bmpItem.Freeze()
         img = self.images[index]
@@ -436,7 +436,7 @@ class PageFinish(PageInstaller):
                      items=[self.listInis, self.listTweaks]),
              LayoutOptions(weight=1)),
             _text(_(u'Notes:')),
-            (balt.RoTextCtrl(self, u''.join(notes), autotooltip=False),
+            (TextArea(self, text=u''.join(notes), auto_tooltip=False),
              LayoutOptions(weight=1)),
             HLayout(items=[
                 Stretch(),

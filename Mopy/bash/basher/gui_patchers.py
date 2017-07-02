@@ -31,7 +31,7 @@ from .. import bass, bosh, bush, balt, load_order, bolt, exception
 from ..balt import fill, StaticText, Links, SeparatorLink, CheckLink, Link
 from ..bolt import GPath
 from ..gui.layouts import HBoxedLayout, VLayout, LayoutOptions, Spacer, TOP
-from ..gui import Button, CheckBox
+from ..gui import Button, CheckBox, TextArea
 from ..patcher import patch_files
 
 reCsvExt = re.compile(ur'\.csv$', re.I | re.U)
@@ -159,8 +159,8 @@ class _AliasesPatcherPanel(_PatcherPanel):
         #gExample = StaticText(gConfigPanel,
         #    _(u"Example Mod 1.esp >> Example Mod 1.2.esp"))
         #--Aliases Text
-        self.gAliases = balt.TextCtrl(gConfigPanel, multiline=True,
-                                      onKillFocus=self.OnEditAliases)
+        self.gAliases = TextArea(gConfigPanel)
+        self.gAliases.bind('lose_focus', self.OnEditAliases)
         self.SetAliasText()
         #--Sizing
         self.main_layout.add((self.gAliases,
@@ -169,11 +169,11 @@ class _AliasesPatcherPanel(_PatcherPanel):
 
     def SetAliasText(self):
         """Sets alias text according to current aliases."""
-        self.gAliases.SetValue(u'\n'.join([
-            u'%s >> %s' % (key.s,value.s) for key,value in sorted(self.aliases.items())]))
+        self.gAliases.text = u'\n'.join([
+            u'%s >> %s' % (key.s,value.s) for key,value in sorted(self.aliases.items())])
 
     def OnEditAliases(self):
-        aliases_text = self.gAliases.GetValue()
+        aliases_text = self.gAliases.text
         self.aliases.clear()
         for line in aliases_text.split(u'\n'):
             fields = map(string.strip,line.split(u'>>'))
