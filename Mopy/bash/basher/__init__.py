@@ -81,14 +81,14 @@ from .. import balt
 from ..balt import CheckLink, EnabledLink, SeparatorLink, Link, \
     ChoiceLink, staticBitmap, AppendableLink, ListBoxes, \
     INIListCtrl, DnDStatusBar, NotebookPanel, BaltFrame, set_event_hook, Events
-from ..balt import StaticText, spinCtrl
+from ..balt import spinCtrl
 from ..balt import colors, images, Image, Resources
 from ..balt import Links, ItemLink
 
 from ..gui.layouts import HLayout, VLayout, LayoutOptions, Spacer, Stretch, \
     RIGHT, TOP
 from ..gui import Button, CancelButton, SaveButton, CheckBox, TextArea, \
-    TextField
+    TextField, Label
 
 # Constants -------------------------------------------------------------------
 from .constants import colorInfo, settingDefaults, karmacons, installercons
@@ -1214,7 +1214,7 @@ class _SashDetailsPanel(_EditableMixinOnFileInfos, SashPanel):
         self.uilist = MasterList(self.masterPanel, keyPrefix=self.keyPrefix,
                                  panel=mod_or_save_panel, detailsPanel=self)
         VLayout(spacing=4, items=[
-            StaticText(self.masterPanel, _(u"Masters:")),
+            Label(self.masterPanel, _(u"Masters:")),
             (self.uilist, LayoutOptions(weight=1, fill=True)),
             (HLayout(spacing=4, items=[self.save, self.cancel]),
              LayoutOptions(h_align=RIGHT))
@@ -1256,7 +1256,7 @@ class ModDetails(_SashDetailsPanel):
         self.modInfo = None
         textWidth = 200
         #--Version
-        self.version = StaticText(top,u'v0.00')
+        self.version = Label(top, u'v0.00')
         #--Author
         self.gAuthor = TextField(top, on_text_change=self.OnAuthorEdit,
                                  max_length=511) # size=(textWidth,-1))
@@ -1279,17 +1279,17 @@ class ModDetails(_SashDetailsPanel):
         #--Layout
         VLayout(spacing=4, default_fill=True, items=[
             HLayout(items=[
-                StaticText(top, _(u'File:')), Stretch(), self.version]),
+                Label(top, _(u'File:')), Stretch(), self.version]),
             self.file,
-            StaticText(top, _(u"Author:")),
+            Label(top, _(u"Author:")),
             self.gAuthor,
-            StaticText(top, _(u"Modified:")),
+            Label(top, _(u"Modified:")),
             self.modified,
-            StaticText(top, _(u"Description:")),
+            Label(top, _(u"Description:")),
             (self.description, LayoutOptions(fill=True, weight=1))
         ]).apply_to(top)
         VLayout(spacing=4, items=[
-            StaticText(self._bottom_low_panel, _(u'Bash Tags:')),
+            Label(self._bottom_low_panel, _(u'Bash Tags:')),
             (self.gTags, LayoutOptions(fill=True, weight=1))
         ]).apply_to(self._bottom_low_panel)
         VLayout(default_weight=1, default_fill=True,
@@ -1566,7 +1566,7 @@ class INIDetailsPanel(_DetailsMixin, SashPanel):
         #--Tweak file
         self.tweakContents = INITweakLineCtrl(left, self.iniContents)
         self.iniContents.SetTweakLinesCtrl(self.tweakContents)
-        self.tweakName = StaticText(left)
+        self.tweakName = Label(left, u'')
         self._enable_buttons()
         self.comboBox = balt.ComboBox(right, value=self.ini_name,
                                       choices=self._ini_keys)
@@ -1609,7 +1609,7 @@ class INIDetailsPanel(_DetailsMixin, SashPanel):
         fileName = super(INIDetailsPanel, self).SetFile(fileName)
         self._ini_detail = fileName
         self.tweakContents.RefreshTweakLineCtrl(fileName)
-        self.tweakName.SetLabel(fileName.sbody if fileName else u'')
+        self.tweakName.text = fileName.sbody if fileName else u''
 
     def _enable_buttons(self):
         isGameIni = bosh.iniInfos.ini in bosh.gameInis
@@ -1860,9 +1860,9 @@ class SaveDetails(_SashDetailsPanel):
         textWidth = 200
         #--Player Info
         self._resetDetails()
-        self.playerInfo = StaticText(top,u" \n \n ")
+        self.playerInfo = Label(top, u' \n \n ')
         self._set_player_info_label()
-        self.gCoSaves = StaticText(top,u'--\n--')
+        self.gCoSaves = Label(top, u'--\n--')
         #--Picture
         self.picture = balt.Picture(top, textWidth, 192 * textWidth / 256,
             background=colors['screens.bkgd.image']) #--Native: 256x192
@@ -1880,7 +1880,7 @@ class SaveDetails(_SashDetailsPanel):
             (self.picture, LayoutOptions(weight=1))
         ]).apply_to(top)
         VLayout(items=[
-            StaticText(self._bottom_low_panel, _(u"Save Notes:")),
+            Label(self._bottom_low_panel, _(u"Save Notes:")),
             (self.gInfo, LayoutOptions(fill=True, weight=1))
         ]).apply_to(self._bottom_low_panel)
         VLayout(default_fill=True, default_weight=1,
@@ -1911,7 +1911,7 @@ class SaveDetails(_SashDetailsPanel):
         #--Set Fields
         self.file.text = self.fileStr
         self._set_player_info_label()
-        self.gCoSaves.SetLabel(self.coSaves)
+        self.gCoSaves.text = self.coSaves
         self.uilist.SetFileInfo(self.saveInfo)
         #--Picture
         if not self.saveInfo:
@@ -1927,11 +1927,11 @@ class SaveDetails(_SashDetailsPanel):
         self.gInfo.text = note_text
 
     def _set_player_info_label(self):
-        self.playerInfo.SetLabel((self.playerNameStr + u'\n' +
+        self.playerInfo.text = (self.playerNameStr + u'\n' +
             _(u'Level') + u' %d, ' + _(u'Day') + u' %d, ' +
             _(u'Play') + u' %d:%02d\n%s') % (
             self.playerLevel, int(self.gameDays), self.playMinutes / 60,
-            (self.playMinutes % 60), self.curCellStr))
+            (self.playMinutes % 60), self.curCellStr)
 
     def OnInfoEdit(self,event):
         """Info field was edited."""
@@ -2279,7 +2279,7 @@ class InstallersList(balt.UIList):
                 VLayout(border=6, spacing=6, items=[
                     HLayout(spacing=6, default_border=6, items=[
                         (staticBitmap(dialog), LayoutOptions(v_align=TOP)),
-                        (StaticText(dialog, message), LayoutOptions(fill=True))
+                        (Label(dialog, message), LayoutOptions(fill=True))
                     ]),
                     Stretch(), Spacer(10), gCheckBox,
                     (HLayout(spacing=4, items=[
@@ -2508,7 +2508,7 @@ class InstallersDetails(_DetailsMixin, SashPanel):
         self.gNotebook.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED,self.OnShowInfoPage)
         subPackagesPanel, espmsPanel = self.checkListSplitter.make_vertical_panes()
         #--Sub-Installers
-        subPackagesLabel = StaticText(subPackagesPanel, _(u'Sub-Packages'))
+        subPackagesLabel = Label(subPackagesPanel, _(u'Sub-Packages'))
         self.gSubList = balt.listBox(subPackagesPanel, isExtended=True,
                                      kind='checklist',
                                      onCheck=self.OnCheckSubItem)
@@ -2537,13 +2537,13 @@ class InstallersDetails(_DetailsMixin, SashPanel):
         VLayout(items=[subPackagesLabel,
                        (self.gSubList, LayoutOptions(fill=True, weight=1))]
                 ).apply_to(subPackagesPanel)
-        VLayout(items=[StaticText(espmsPanel, _(u'Esp/m Filter')),
+        VLayout(items=[Label(espmsPanel, _(u'Esp/m Filter')),
                        (self.gEspmList, LayoutOptions(fill=True, weight=1))]
                 ).apply_to(espmsPanel)
         VLayout(default_fill=True,
                 items=[self.gPackage, (subSplitter, LayoutOptions(weight=1))]
                 ).apply_to(top)
-        VLayout(items=[StaticText(commentsPanel, _(u'Comments')),
+        VLayout(items=[Label(commentsPanel, _(u'Comments')),
                        (self.gComments, LayoutOptions(fill=True, weight=1))]
                 ).apply_to(commentsPanel)
         VLayout(default_fill=True, default_weight=1, items=[commentsPanel]

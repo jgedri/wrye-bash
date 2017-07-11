@@ -390,22 +390,22 @@ def ok_and_cancel_group(parent, on_ok=None):
     return HLayout(spacing=4, items=[gui.OkButton(parent, on_click=on_ok),
                                      gui.CancelButton(parent)])
 
-class StaticText(wx.StaticText):
-    """Static text element."""
-
-    def __init__(self, parent, label=u'', pos=defPos, size=defSize, style=0,
-                 noAutoResize=False, name=u"staticText"):
-        if noAutoResize: style |= wx.ST_NO_AUTORESIZE
-        wx.StaticText.__init__(self, parent, defId, label, pos, size, style,
-                               name)
-        self._label = label # save the unwrapped text
-        self.Rewrap()
-
-    def Rewrap(self, width=None):
-        self.Freeze()
-        self.SetLabel(self._label)
-        self.Wrap(width or self.GetSize().width)
-        self.Thaw()
+# class StaticText(wx.StaticText):
+#     """Static text element."""
+#
+#     def __init__(self, parent, label=u'', pos=defPos, size=defSize, style=0,
+#                  noAutoResize=False, name=u"staticText"):
+#         if noAutoResize: style |= wx.ST_NO_AUTORESIZE
+#         wx.StaticText.__init__(self, parent, defId, label, pos, size, style,
+#                                name)
+#         self._label = label # save the unwrapped text
+#         self.Rewrap()
+#
+#     def Rewrap(self, width=None):
+#         self.Freeze()
+#         self.SetLabel(self._label)
+#         self.Wrap(width or self.GetSize().width)
+#         self.Thaw()
 
 def spinCtrl(parent, value=u'', pos=defPos, size=defSize,
              style=wx.SP_ARROW_KEYS, min=0, max=100, initial=0,
@@ -529,7 +529,8 @@ def _continueDialog(parent, message, title, checkBoxText):
         VLayout(border=6, spacing=6, default_fill=True, items=[
             (HLayout(spacing=6, items=[
                 (staticBitmap(dialog), LayoutOptions(border=6, v_align=TOP)),
-                (StaticText(dialog, message, noAutoResize=True),
+                (gui.Label(dialog, message),
+                 # TODO(nycz): GUI for label ^ noAutoResize=True),
                  LayoutOptions(fill=True, weight=1))]),
              LayoutOptions(weight=1)),
             gCheckBox,
@@ -1008,10 +1009,9 @@ class ListEditor(Dialog):
         # overrides Dialog.sizesKey
         self.sizesKey = self._listEditorData.__class__.__name__
         #--Caption
+        captionText = None # type: gui.Label
         if data.caption:
-            captionText = StaticText(self,data.caption)
-        else:
-            captionText = None
+            captionText = gui.Label(self,data.caption)
         #--List Box
         self.listBox = listBox(self, choices=self._list_items)
         self.listBox.SetSizeHints(125,150)
@@ -2730,7 +2730,7 @@ class ListBoxes(Dialog):
         self.itemMenu.append(_CheckList_SelectAll(False))
         self.SetIcons(Resources.bashBlue)
         minWidth = self.GetTextExtent(title)[0] * 1.2 + 64
-        self.text = StaticText(self, message)
+        self.text = gui.Label(self, message)
         self.text.Rewrap(minWidth) # otherwise self.text expands to max width
         layout = VLayout(border=5, spacing=5, items=[self.text])
         self._ids = {}

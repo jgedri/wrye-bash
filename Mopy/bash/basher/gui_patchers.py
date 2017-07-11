@@ -28,10 +28,10 @@ from operator import itemgetter
 import wx
 # Internal
 from .. import bass, bosh, bush, balt, load_order, bolt, exception
-from ..balt import fill, StaticText, Links, SeparatorLink, CheckLink, Link
+from ..balt import fill, Links, SeparatorLink, CheckLink, Link
 from ..bolt import GPath
 from ..gui.layouts import HBoxedLayout, VLayout, LayoutOptions, Spacer, TOP
-from ..gui import Button, CheckBox, TextArea
+from ..gui import Button, CheckBox, TextArea, Label
 from ..patcher import patch_files
 
 reCsvExt = re.compile(ur'\.csv$', re.I | re.U)
@@ -69,7 +69,7 @@ class _PatcherPanel(object):
         self.gConfigPanel = wx.Panel(parent, style=self.__class__.style)
         self.main_layout = VLayout(
             default_fill=True, default_weight=1, items=[
-                (StaticText(self.gConfigPanel, fill(self.text, 70)),
+                (Label(self.gConfigPanel, fill(self.text, 70)),
                  LayoutOptions(weight=0))])
         self.main_layout.apply_to(self.gConfigPanel)
         config_layout.add(self.gConfigPanel)

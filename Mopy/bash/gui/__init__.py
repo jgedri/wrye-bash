@@ -207,3 +207,15 @@ class TextField(_AbstractTextInput):
                                         on_text_change, auto_tooltip)
         if max_length:
             self._native_widget.SetMaxLength(max_length)
+
+# Misc elements ---------------------------------------------------------------
+class Label(Widget):
+    def __init__(self, parent, text):
+        super(Label, self).__init__()
+        self._native_widget = _wx.StaticText(parent, _wx.ID_ANY, text)
+
+    @property
+    def text(self): return self._native_widget.GetLabel()
+    @text.setter
+    def text(self, new_text): # type: (unicode) -> None
+        self._native_widget.SetLabel(new_text)
