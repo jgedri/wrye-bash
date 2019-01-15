@@ -12,7 +12,9 @@ lootApiWrapperVersion = '3.1.1'
 lootApiWrapperRevision ='f97de90'
 
 try:
-    sys.path.append('Mopy')
+    scripts_path = os.path.dirname(os.path.abspath(__file__))
+    mopy_path = os.path.join(scripts_path, '..', 'Mopy')
+    sys.path.append(mopy_path)
     import loot_api
 except ImportError:
     print 'Importing the loot api failed'
@@ -79,5 +81,3 @@ if isLootApiInstalled(lootApiWrapperVersion, lootApiWrapperRevision):
 else:
     destination_folder = os.path.join('..', 'Mopy')
     installLootApi(lootApiWrapperVersion, lootApiWrapperRevision, destination_folder)
-
-raw_input('> Done')

@@ -92,15 +92,15 @@ except:
 
 
 # ensure we are in the correct directory so relative paths will work properly
-scriptDir = os.path.dirname(unicode(sys.argv[0], sys.getfilesystemencoding()))
+scriptDir = os.path.dirname(os.path.abspath(__file__))
 if scriptDir:
     os.chdir(scriptDir)
 os.chdir(u'..')
 
 
 # Setup some global paths that all functions will use
-root = os.getcwdu()
-scripts = os.path.join(root, u'scripts')
+scripts = os.path.dirname(os.path.abspath(__file__))
+root = os.path.join(scripts, u'..')
 mopy = os.path.join(root, u'Mopy')
 apps = os.path.join(mopy, u'Apps')
 if sys.platform.lower().startswith('linux'):

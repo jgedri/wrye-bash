@@ -23,7 +23,8 @@ import sys
 import tempfile
 import urllib
 
-mopy_path = os.path.join(os.getcwd(), '..', 'Mopy')
+scripts_path = os.path.dirname(os.path.abspath(__file__))
+mopy_path = os.path.join(scripts_path, '..', 'Mopy')
 sys.path.append(mopy_path)
 
 import loot_api
@@ -70,5 +71,3 @@ for fsName, masterFileName, repository, gameType in gamesData:
     CleanUpMockedGameInstall(gameInstallPath)
 
 print u'Taglist generator finished.'
-
-raw_input(u'Done')
