@@ -56,15 +56,11 @@ class WizardReturn(object):
 
 class InstallerFomod(wiz.Wizard):
     def __init__(self, parent_window, installer, page_size, pos):
-        fomod_files = installer.fomod_files()
-        info_path = fomod_files[0]
-        if info_path is not None:
-            info_path = info_path.s
-        conf_path = fomod_files[1].s
+        fomod_file = installer.fomod_file().s
         data_path = bass.dirs['mods']
         ver = env.get_file_version(bass.dirs['app'].join(bush.game.exe).s)
         game_ver = u'.'.join([unicode(i) for i in ver])
-        self.parser = FomodInstaller(info_path, conf_path, dest=data_path,
+        self.parser = FomodInstaller(fomod_file, dest=data_path,
                                      game_version=game_ver)
         mod_name = self.parser.fomod_name
 

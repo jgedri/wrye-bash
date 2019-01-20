@@ -370,26 +370,10 @@ class FomodInstaller(object):
     after the installation process to keep track of flag and file changes,
     respectively.
     """
-    def __init__(self, info_path, conf_path, dest=None, game_version=None):
+    def __init__(self, conf_path, dest=None, game_version=None):
         # read metadata
         conf_tree = etree.parse(conf_path)
         self.fomod_name = conf_tree.findtext('moduleName', '').strip()
-        elem_image = conf_tree.find('moduleImage')
-        if elem_image is None:
-            self.fomod_image = ''
-        else:
-            self.fomod_image = elem_image.get('path', '')
-        if info_path is not None:  # info.xml is optional - has only metadata
-            info_tree = etree.parse(info_path)
-            self.fomod_author = info_tree.findtext('Author', '').strip()
-            self.fomod_version = info_tree.findtext('Version', '').strip()
-            self.fomod_description = info_tree.findtext('Description', '').strip()
-            self.fomod_website = info_tree.findtext('Website', '').strip()
-        else:
-            self.fomod_author = ""
-            self.fomod_version = ""
-            self.fomod_description = ""
-            self.fomod_website = ""
 
         # setup the installer
         self.gen = self._installer(conf_tree, dest, game_version)

@@ -195,7 +195,6 @@ class Installer(object):
         # LowerDict mapping destinations (relative to Data/ directory) of files
         # in this installer to their size and crc - built in refreshDataSizeCrc
         self.ci_dest_sizeCrc = bolt.LowerDict()
-        self.has_fomod_info = False
         self.has_fomod_conf = False
         self.hasWizard = False
         self.hasBCF = False
@@ -604,7 +603,7 @@ class Installer(object):
         """
         type_    = self.type
         #--Init to empty
-        self.has_fomod_info = self.has_fomod_conf = False
+        self.has_fomod_conf = False
         self.hasWizard = self.hasBCF = self.hasReadme = False
         self.packageDoc = self.packagePic = None # = self.extras_dict['readMe']
         for attr in {'skipExtFiles','skipDirFiles','espms'}:
@@ -652,9 +651,7 @@ class Installer(object):
         root_path = self.extras_dict.get('root_path', u'')
         rootIdex = len(root_path)
         for full,size,crc in self.fileSizeCrcs:
-            if full.lower() == "fomod" + os.sep + "info.xml":
-                self.has_fomod_info = full
-            elif full.lower() == "fomod" + os.sep + "moduleconfig.xml":
+            if full.lower() == "fomod" + os.sep + "moduleconfig.xml":
                 self.has_fomod_conf = full
             fomod_dict = self.extras_dict.get('fomod_files_dict', {})
             if self.extras_dict.get('fomod_active', False) and full in fomod_dict.values():
@@ -1001,7 +998,7 @@ class Installer(object):
     def open_wizard(self): self._open_txt_file(self.hasWizard)
     def _open_txt_file(self, rel_path): raise AbstractError
     def wizard_file(self): raise AbstractError
-    def fomod_files(self): raise AbstractError
+    def fomod_file(self): raise AbstractError
 
     def __repr__(self):
         return self.__class__.__name__ + u"<" + repr(self.archive) + u">"
@@ -1296,12 +1293,10 @@ class InstallerArchive(Installer):
                 bolt.SubProgress(progress,0,0.9), recurse=True)
         return unpack_dir.join(self.hasWizard)
 
-    def fomod_files(self):
+    def fomod_file(self):
         with balt.Progress(_(u'Extracting fomod files...'), u'\n' + u' ' * 60,
                            abort=True) as progress:
             files_to_extract = [self.has_fomod_conf]
-            if self.has_fomod_info:
-                files_to_extract.append(self.has_fomod_info)
             files_to_extract.extend(x for (x, _s, _c) in self.fileSizeCrcs if
                                     x.lower().endswith((
                                         u'bmp', u'jpg', u'jpeg', u'png',
@@ -1311,11 +1306,7 @@ class InstallerArchive(Installer):
             unpack_dir = self.unpackToTemp(files_to_extract,
                                            bolt.SubProgress(progress, 0, 0.9),
                                            recurse=True)
-        if self.has_fomod_info:
-            return (unpack_dir.join(self.has_fomod_info),
-                    unpack_dir.join(self.has_fomod_conf))
-        else:
-            return None, unpack_dir.join(self.has_fomod_conf)
+        return unpack_dir.join(self.has_fomod_conf)
 
 #------------------------------------------------------------------------------
 class InstallerProject(Installer):
@@ -1519,13 +1510,8 @@ class InstallerProject(Installer):
     def wizard_file(self):
         return bass.dirs['installers'].join(self.archive, self.hasWizard)
 
-    def fomod_files(self):
-        if self.has_fomod_info:
-            info = bass.dirs['installers'].join(self.archive, self.has_fomod_info)
-        else:
-            info = None
-        conf = bass.dirs['installers'].join(self.archive, self.has_fomod_conf)
-        return info, conf
+    def fomod_file(self):
+        return bass.dirs['installers'].join(self.archive, self.has_fomod_conf)
 
 def projects_walk_cache(func): ##: HACK ! Profile
     """Decorator to make sure I dont leak self._dir_dirs_files project cache.
