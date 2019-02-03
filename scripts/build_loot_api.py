@@ -2,13 +2,12 @@
 # -*- coding: utf-8 -*-
 
 import os
-import platform
 import subprocess
 import sys
 import tempfile
-import urllib
 
 import _winreg
+import build_utils
 
 LOOT_API_VERSION = "3.1.1"
 LOOT_API_REVISION = "f97de90"
@@ -24,12 +23,8 @@ except ImportError:
     loot_api = None
 
 
-def is_os_64bit():
-    return platform.machine().endswith("64")
-
-
 def is_msvc_redist_installed(major, minor, build):
-    if is_os_64bit():
+    if build_utils.is_os_64bit():
         sub_key = "SOFTWARE\\Microsoft\\VisualStudio\\14.0\\VC\\Runtimes\\x64"
     else:
         sub_key = "SOFTWARE\\Microsoft\\VisualStudio\\14.0\\VC\\Runtimes\\x86"
@@ -60,7 +55,7 @@ def install_msvc_redist(dl_dir):
     )
     dl_file = os.path.join(dl_dir, "vc_redist.x86.exe")
     print "Downloading the MSVC 2015 redistributable..."
-    urllib.urlretrieve(url, dl_file)  # fixme XXX: get a progress meter
+    build_utils.download_file(url, dl_file)
     print "Installing the MSVC 2015 redistributable..."
     subprocess.call([dl_file, "/quiet"])
     os.remove(dl_file)
@@ -92,7 +87,7 @@ def install_loot_api(version, revision, dl_dir, destination_path):
     if os.path.exists(loot_api_pyd):
         os.remove(loot_api_pyd)
     print 'Downloading LOOT API Python wrapper from "{}"...'.format(url)
-    urllib.urlretrieve(url, archive_path)  # fixme XXX: get a progress meter
+    build_utils.download_file(url, archive_path)
     print "Extracting LOOT API Python wrapper to " + destination_path
     subprocess.call(
         [
