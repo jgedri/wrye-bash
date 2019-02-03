@@ -6,7 +6,7 @@
 #
 # This script generates taglist.yaml files in Mopy/Bashed Patches game
 # subdirectories using the LOOT API and masterlists. The LOOT API Python module
-# must be installed in the Mopy folder (use the install_loot_api.py script).
+# must be installed in the Mopy folder (use the build_loot_api.py script).
 # The script will skip generating taglists for any games that do not have a
 # folder in Mopy/Bashed Patches that matches the first tuple element in the
 # gamesData tuples below, so if adding a taglist for a new game, create the
