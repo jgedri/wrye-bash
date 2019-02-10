@@ -1,13 +1,56 @@
 #!/usr/bin/env python2
 
+import logging
 import math
 import os
-import platform
+import sys
 import urllib2
 
+BUILD_LOG = os.path.join(os.path.dirname(os.path.abspath(__file__)), "build.log")
 
-def is_os_64bit():
-    return platform.machine().endswith("64")
+
+# verbosity:
+#  30 - quiet (warnings and above)
+#  20 - regular (info and above)
+#  10 - verbose (all messages)
+def setup_log(logger, verbosity=20, logfile=BUILD_LOG):
+    logger.setLevel(0)
+
+    file_handler = logging.FileHandler(logfile, mode="w")
+    file_formatter = logging.Formatter("[%(module)s]: %(message)s")
+    file_handler.setFormatter(file_formatter)
+    logger.addHandler(file_handler)
+
+    stdout_handler = logging.StreamHandler(sys.stdout)
+    stdout_formatter = logging.Formatter("%(message)s")
+    stdout_handler.setFormatter(stdout_formatter)
+    stdout_handler.setLevel(verbosity)
+    logger.addHandler(stdout_handler)
+
+
+# sets up common parser options
+def setup_common_parser(parser):
+    parser.add_argument(
+        "-l", "--logfile", default=BUILD_LOG, help="Where to store the build log."
+    )
+    verbose_group = parser.add_mutually_exclusive_group()
+    verbose_group.add_argument(
+        "-v",
+        "--verbose",
+        action="store_const",
+        const=10,
+        dest="verbosity",
+        help="Print all output to console.",
+    )
+    verbose_group.add_argument(
+        "-q",
+        "--quiet",
+        action="store_const",
+        const=30,
+        dest="verbosity",
+        help="Do not print any output to console.",
+    )
+    parser.set_defaults(verbosity=20)
 
 
 def convert_bytes(size_bytes):
