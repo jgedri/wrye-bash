@@ -17,11 +17,14 @@
 #
 # =============================================================================
 
+import argparse
+import logging
 import os
 import shutil
 import sys
 import tempfile
 
+import build_loot_api
 import build_utils
 
 SCRIPTS_PATH = os.path.dirname(os.path.abspath(__file__))
@@ -31,20 +34,16 @@ sys.path.append(MOPY_PATH)
 try:
     import loot_api
 except ImportError:
-    import build_loot_api
-
-    build_loot_api.main()
-    import loot_api
+    loot_api = None
 
 
-GAME_DATA = [
-    (u"Oblivion", "Oblivion.esm", "oblivion", loot_api.GameType.tes4),
-    (u"Skyrim", "Skyrim.esm", "skyrim", loot_api.GameType.tes5),
-    (u"Skyrim Special Edition", "Skyrim.esm", "skyrimse", loot_api.GameType.tes5se),
-    (u"Fallout3", "Fallout3.esm", "fallout3", loot_api.GameType.fo3),
-    (u"FalloutNV", "FalloutNV.esm", "falloutnv", loot_api.GameType.fonv),
-    (u"Fallout4", "Fallout4.esm", "fallout4", loot_api.GameType.fo4),
-]
+def setup_parser(parser):
+    parser.add_argument(
+        "-mv",
+        "--masterlist-version",
+        default="0.13",
+        help="Which loot masterlist version to download.",
+    )
 
 
 def mock_game_install(master_file_name):
@@ -54,42 +53,79 @@ def mock_game_install(master_file_name):
     return game_path
 
 
-def download_masterlist(repository, destination_path):
-    url = u"https://raw.githubusercontent.com/loot/{}/v0.13/masterlist.yaml".format(
-        repository
+def download_masterlist(repository, version, dl_path):
+    url = "https://raw.githubusercontent.com/loot/{}/v{}/masterlist.yaml".format(
+        repository, version
     )
-    build_utils.download_file(url, destination_path)
+    logging.info("Downloading {} masterlist from {}".format(repository, url))
+
+    logging.debug("Downloading {} masterlist to {}".format(repository, dl_path))
+    build_utils.download_file(url, dl_path)
 
 
-def main():
-    print u"Loaded the LOOT API v{0} using wrapper version {1}".format(
-        loot_api.Version.string(), loot_api.WrapperVersion.string()
+def main(args):
+    logging.debug(
+        u"Loaded the LOOT API v{} using wrapper version {}".format(
+            loot_api.Version.string(), loot_api.WrapperVersion.string()
+        )
     )
 
-    for game_name, master_name, repository, game_type in GAME_DATA:
+    game_data = [
+        (u"Oblivion", "Oblivion.esm", "oblivion", loot_api.GameType.tes4),
+        (u"Skyrim", "Skyrim.esm", "skyrim", loot_api.GameType.tes5),
+        (u"Skyrim Special Edition", "Skyrim.esm", "skyrimse", loot_api.GameType.tes5se),
+        (u"Fallout3", "Fallout3.esm", "fallout3", loot_api.GameType.fo3),
+        (u"FalloutNV", "FalloutNV.esm", "falloutnv", loot_api.GameType.fonv),
+        (u"Fallout4", "Fallout4.esm", "fallout4", loot_api.GameType.fo4),
+    ]
+
+    for game_name, master_name, repository, game_type in game_data:
         game_install_path = mock_game_install(master_name)
 
         masterlist_path = os.path.join(game_install_path, u"masterlist.yaml")
         game_dir = os.path.join(MOPY_PATH, u"Bash Patches", game_name)
         taglist_path = os.path.join(game_dir, u"taglist.yaml")
         if not os.path.exists(game_dir):
-            print (
+            logging.error(
                 u"Skipping taglist for {} as its output "
                 u"directory does not exist".format(game_name)
             )
             continue
-        download_masterlist(repository, masterlist_path)
+        download_masterlist(repository, args.masterlist_version, masterlist_path)
+
         loot_api.initialise_locale("")
         loot_game = loot_api.create_game_handle(game_type, game_install_path)
         loot_db = loot_game.get_database()
         loot_db.load_lists(masterlist_path)
         loot_db.write_minimal_list(taglist_path, True)
-        print u"{} masterlist converted.".format(game_name)
+        logging.info(u"{} masterlist converted.".format(game_name))
 
         shutil.rmtree(game_install_path)
 
-    print u"Taglist generator finished."
-
 
 if __name__ == "__main__":
-    main()
+    argparser = argparse.ArgumentParser(
+        description="Generate and update taglists for supported games."
+    )
+    build_utils.setup_common_parser(argparser)
+    setup_parser(argparser)
+
+    if loot_api is None:
+        loot_group = argparser.add_argument_group(
+            title="loot api arguments",
+            description="LOOT API could not be found and will be installed.",
+        )
+        build_loot_api.setup_parser(loot_group)
+
+    parsed_args = argparser.parse_args()
+
+    build_utils.setup_log(
+        logging.getLogger(),
+        verbosity=parsed_args.verbosity,
+        logfile=parsed_args.logfile,
+    )
+
+    if loot_api is None:
+        build_loot_api.main(parsed_args)
+
+    main(parsed_args)
