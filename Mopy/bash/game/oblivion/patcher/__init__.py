@@ -38,6 +38,4 @@ gameSpecificPatchers = {
 gameSpecificListPatchers = {
     "CoblExhaustion": pi(CoblExhaustion, 'CBash_CoblExhaustion'),
     "CBash_CoblExhaustion": pi(CBash_CoblExhaustion, 'CoblExhaustion'),
-    "MFactMarker": pi(MFactMarker, 'CBash_MFactMarker'),
-    "CBash_MFactMarker": pi(CBash_MFactMarker, 'MFactMarker'),
 }

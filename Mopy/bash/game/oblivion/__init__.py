@@ -129,17 +129,17 @@ class OblivionGameInfo(GameInfo):
                u'Deactivate', u'Delev', u'Eyes', u'Factions', u'Relations',
                u'Filter', u'Graphics', u'Hair', u'IIM', u'Invent', u'Names',
                u'NoMerge', u'NpcFaces', u'R.Relations', u'Relev', u'Scripts',
-               u'ScriptContents', u'Sound', u'SpellStats', u'Stats',
-               u'Voice-F', u'Voice-M', u'R.Teeth', u'R.Mouth', u'R.Ears',
-               u'R.Head', u'R.Attributes-F', u'R.Attributes-M', u'R.Skills',
-               u'R.Description', u'R.AddSpells', u'R.ChangeSpells', u'Roads',
-               u'Actors.Anims', u'Actors.AIData', u'Actors.DeathItem',
-               u'Actors.AIPackages', u'Actors.AIPackagesForceAdd',
-               u'Actors.Stats', u'Actors.ACBS', u'NPC.Class',
-               u'Actors.CombatStyle', u'Creatures.Blood', u'Actors.Spells',
-               u'Actors.SpellsForceAdd', u'NPC.Race', u'Actors.Skeleton',
-               u'NpcFacesForceFullImport', u'MustBeActiveIfImported',
-               u'Npc.HairOnly', u'Npc.EyesOnly'}  # , 'ForceMerge'
+               u'Sound', u'SpellStats', u'Stats', u'Voice-F', u'Voice-M',
+               u'R.Teeth', u'R.Mouth', u'R.Ears', u'R.Head', u'R.Attributes-F',
+               u'R.Attributes-M', u'R.Skills', u'R.Description',
+               u'R.AddSpells', u'R.ChangeSpells', u'Roads', u'Actors.Anims',
+               u'Actors.AIData', u'Actors.DeathItem', u'Actors.AIPackages',
+               u'Actors.AIPackagesForceAdd', u'Actors.Stats', u'Actors.ACBS',
+               u'NPC.Class', u'Actors.CombatStyle', u'Creatures.Blood',
+               u'Actors.Spells', u'Actors.SpellsForceAdd', u'NPC.Race',
+               u'Actors.Skeleton', u'NpcFacesForceFullImport',
+               u'MustBeActiveIfImported', u'Npc.HairOnly', u'Npc.EyesOnly'}
+               #, ForceMerge}
 
     patchers = (
         'AliasesPatcher', 'AssortedTweaker', 'PatchMerger', 'AlchemicalCatalogs',
@@ -147,9 +147,9 @@ class OblivionGameInfo(GameInfo):
         'CoblExhaustion', 'UpdateReferences', 'CellImporter', 'ClothesTweaker',
         'GmstTweaker', 'GraphicsPatcher', 'ImportFactions', 'ImportInventory',
         'SpellsPatcher', 'TweakActors', 'ImportRelations', 'ImportScripts',
-        'ImportActorsSpells', 'ListsMerger', 'MFactMarker', 'NamesPatcher',
-        'NamesTweaker', 'NpcFacePatcher', 'RacePatcher', 'RoadImporter',
-        'SoundPatcher', 'StatsPatcher', 'SEWorldEnforcer', 'ContentsChecker',
+        'ImportActorsSpells', 'ListsMerger', 'NamesPatcher', 'NamesTweaker',
+        'NpcFacePatcher', 'RacePatcher', 'RoadImporter', 'SoundPatcher',
+        'StatsPatcher', 'SEWorldEnforcer', 'ContentsChecker',
         )
 
     CBash_patchers = (
@@ -160,10 +160,10 @@ class OblivionGameInfo(GameInfo):
         'CBash_ClothesTweaker', 'CBash_GmstTweaker', 'CBash_GraphicsPatcher',
         'CBash_ImportFactions', 'CBash_ImportInventory', 'CBash_SpellsPatcher',
         'CBash_TweakActors', 'CBash_ImportRelations', 'CBash_ImportScripts',
-        'CBash_ImportActorsSpells', 'CBash_ListsMerger', 'CBash_MFactMarker',
-        'CBash_NamesPatcher', 'CBash_NamesTweaker', 'CBash_NpcFacePatcher',
-        'CBash_RacePatcher', 'CBash_RoadImporter', 'CBash_SoundPatcher',
-        'CBash_StatsPatcher', 'CBash_SEWorldEnforcer', 'CBash_ContentsChecker',
+        'CBash_ImportActorsSpells', 'CBash_ListsMerger', 'CBash_NamesPatcher',
+        'CBash_NamesTweaker', 'CBash_NpcFacePatcher', 'CBash_RacePatcher',
+        'CBash_RoadImporter', 'CBash_SoundPatcher', 'CBash_StatsPatcher',
+        'CBash_SEWorldEnforcer', 'CBash_ContentsChecker',
         )
 
     weaponTypes = (
