@@ -443,7 +443,7 @@ def get_cosave_type(game_fsName):
     """:rtype: type"""
     if game_fsName == u'Oblivion':
         return ObseCosave
-    elif game_fsName == u'Skyrim':
+    elif game_fsName in (u'Enderal', u'Skyrim'):
         return SkseCosave
     elif game_fsName == u'Skyrim Special Edition':
         _SEChunk._espm_chunk_type = {'SDOM', 'DOML'}
