@@ -963,7 +963,7 @@ class INIInfo(IniFile):
 
 #------------------------------------------------------------------------------
 from .save_headers import get_save_header_type, SaveFileHeader
-from ._saves import PluggyFile
+from .cosaves import PluggyFile
 from . import cosaves
 
 class SaveInfo(FileInfo):
@@ -1054,7 +1054,7 @@ class SaveInfo(FileInfo):
 
     def get_se_cosave_path(self):
         if self.cosave_type is None: return None
-        return self.getPath().root + u'.' + self.cosave_type.signature.lower()
+        return self.getPath().root + bush.game.se.cosave_ext
 
 #------------------------------------------------------------------------------
 class DataStore(DataDict):
