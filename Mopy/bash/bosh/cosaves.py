@@ -31,20 +31,52 @@ from ..bolt import sio, GPath, decode, encode, unpack_string, unpack_int, \
     struct_unpack, deprint
 from ..exception import FileError
 
-class _xSEHeader(object):
-    __slots__ = ('signature', 'formatVersion', 'obseVersion',
-                 'obseMinorVersion', 'oblivionVersion', 'numPlugins')
+class _AHeader(object):
+    """Abstract base class for cosave headers."""
+    signature = 'OVERRIDE'
+    __slots__ = ()
+
+    def __init__(self, ins, cosave_path):
+        """
+        The base constructor for headers checks if the expected signature for
+        this header matches the actual signature found in the file.
+
+        :param ins: The input stream to read from.
+        :param cosave_path: The path to the cosave.
+        """
+        actual_signature = unpack_string(ins, len(self.signature))
+        if actual_signature != self.signature:
+            raise FileError(cosave_path, u'Signature wrong: got %r, but '
+                                         u'expected %r' %
+                            (actual_signature, self.signature))
+
+class _xSEHeader(_AHeader):
+    """Header for xSE cosaves."""
+    __slots__ = ('formatVersion', 'obseVersion', 'obseMinorVersion',
+                 'oblivionVersion', 'numPlugins')
+
     # numPlugins: the xSE plugins the cosave knows about - including xSE itself
-    def __init__(self, ins, cosave_path, signature):
-        self.signature = unpack_string(ins, len(signature))
-        if self.signature != signature:
-            raise FileError(cosave_path, u'Signature wrong: %r (expected %r)' %
-                (self.signature, signature))
+    def __init__(self, ins, cosave_path):
+        super(_xSEHeader, self).__init__(ins, cosave_path)
         self.formatVersion = unpack_int(ins)
         self.obseVersion = unpack_short(ins)
         self.obseMinorVersion = unpack_short(ins)
         self.oblivionVersion = unpack_int(ins)
         self.numPlugins = unpack_int(ins)
+
+class _PluggyHeader(_AHeader):
+    """Header for pluggy cosaves. Just checks signature and version."""
+    signature = 'PluggySave'
+    __slots__ = ()
+
+    def __init__(self, ins, cosave_path):
+        super(_PluggyHeader, self).__init__(ins, cosave_path)
+        # Taken from pluggy save file format docs
+        version = unpack_int(ins)
+        if version > 0x0105000:
+            raise FileError(cosave_path, u'Version of pluggy save file format '
+                                         u'is too new - only versions up to '
+                                         u'1.6.0000 are supported.')
 
 class _AChunk(object):
     __slots__ = ('chunkType', 'chunkVersion', 'chunkLength', 'chunkData')
@@ -354,7 +386,7 @@ class xSECoSave(ACoSaveFile):
     def __init__(self, cosave_path):
         super(xSECoSave, self).__init__(cosave_path)
         with open(u'%s' % cosave_path, 'rb') as ins:
-            self.cosave_header = _xSEHeader(ins, cosave_path, self.signature)
+            self.cosave_header = _xSEHeader(ins, cosave_path)
             self.plugin_chunks = []
             for x in xrange(self.cosave_header.numPlugins):
                 self.plugin_chunks.append(_PluginChunk(
@@ -446,18 +478,24 @@ class FoseCosave(xSECoSave):
 def get_cosave_type(game_fsName):
     """:rtype: type"""
     if game_fsName == u'Oblivion':
+        _xSEHeader.signature = 'OBSE'
         return ObseCosave
     elif game_fsName == u'Skyrim':
+        _xSEHeader.signature = 'SKSE'
         return SkseCosave
     elif game_fsName == u'Skyrim Special Edition':
+        _xSEHeader.signature = 'SKSE'
         _xSEChunk._espm_chunk_type = {'SDOM', 'DOML'}
         return SkseCosave
     elif game_fsName == u'Fallout4':
+        _xSEHeader.signature = 'F4SE'
         _xSEChunk._espm_chunk_type = {'SDOM', 'DOML'}
         return F4seCosave
     elif game_fsName == u'Fallout3':
+        _xSEHeader.signature = 'FOSE'
         return FoseCosave
     elif game_fsName == u'FalloutNV':
+        _xSEHeader.signature = 'NVSE'
         return NvseCosave
     return None
 
