@@ -31,6 +31,10 @@ from ..bolt import sio, GPath, decode, encode, unpack_string, unpack_int, \
     struct_unpack, deprint
 from ..exception import FileError
 
+# Small helper functions for quickly packing and unpacking
+def _pack(buff, fmt, *args): buff.write(struct_pack(fmt, *args))
+def _unpack(ins, fmt, size): return struct_unpack(fmt, ins.read(size))
+
 class _AHeader(object):
     """Abstract base class for cosave headers."""
     signature = 'OVERRIDE'
@@ -107,11 +111,9 @@ class _xSEChunk(_AChunk):
 
     def log_chunk(self, log, ins, save_masters, espmMap):
         chunkType = self.chunkType
-        def _unpack(fmt, fmt_siz):
-            return struct_unpack(fmt, ins.read(fmt_siz))
         if chunkType == 'RVTS':
             #--OBSE String
-            modIndex, stringID, stringLength, = _unpack('=BIH', 7)
+            modIndex, stringID, stringLength, = _unpack(ins, '=BIH', 7)
             stringData = decode(ins.read(stringLength))
             log(u'    ' + _(u'Mod :') + u'  %02X (%s)' % (
                 modIndex, save_masters[modIndex].s))
@@ -119,7 +121,7 @@ class _xSEChunk(_AChunk):
             log(u'    ' + _(u'Data:') + u'  %s' % stringData)
         elif chunkType == 'RVRA':
             #--OBSE Array
-            modIndex, arrayID, keyType, isPacked, = _unpack('=BIBB', 7)
+            modIndex, arrayID, keyType, isPacked, = _unpack(ins, '=BIBB', 7)
             if modIndex == 255:
                 log(_(u'    Mod :  %02X (Save File)') % modIndex)
             else:
@@ -136,41 +138,41 @@ class _xSEChunk(_AChunk):
             else:
                 log(_(u'    Type:  Unknown'))
             if self.chunkVersion >= 1:
-                numRefs, = _unpack('=I', 4)
+                numRefs, = _unpack(ins, '=I', 4)
                 if numRefs > 0:
                     log(u'    Refs:')
                     for x in range(numRefs):
-                        refModID, = _unpack('=B', 1)
+                        refModID, = _unpack(ins, '=B', 1)
                         if refModID == 255:
                             log(_(u'      %02X (Save File)') % refModID)
                         else:
                             log(u'      %02X (%s)' % (
                                 refModID, save_masters[refModID].s))
-            numElements, = _unpack('=I', 4)
+            numElements, = _unpack(ins, '=I', 4)
             log(_(u'    Size:  %u') % numElements)
             for i in range(numElements):
                 if keyType == 1:
-                    key, = _unpack('=d', 8)
+                    key, = _unpack(ins, '=d', 8)
                     keyStr = u'%f' % key
                 elif keyType == 3:
-                    keyLen, = _unpack('=H', 2)
+                    keyLen, = _unpack(ins, '=H', 2)
                     key = ins.read(keyLen)
                     keyStr = decode(key)
                 else:
                     keyStr = 'BAD'
-                dataType, = _unpack('=B', 1)
+                dataType, = _unpack(ins, '=B', 1)
                 if dataType == 1:
-                    data, = _unpack('=d', 8)
+                    data, = _unpack(ins, '=d', 8)
                     dataStr = u'%f' % data
                 elif dataType == 2:
-                    data, = _unpack('=I', 4)
+                    data, = _unpack(ins, '=I', 4)
                     dataStr = u'%08X' % data
                 elif dataType == 3:
-                    dataLen, = _unpack('=H', 2)
+                    dataLen, = _unpack(ins, '=H', 2)
                     data = ins.read(dataLen)
                     dataStr = decode(data)
                 elif dataType == 4:
-                    data, = _unpack('=I', 4)
+                    data, = _unpack(ins, '=I', 4)
                     dataStr = u'%u' % data
                 log(u'    [%s]:%s = %s' % (keyStr, (
                 u'BAD', u'NUM', u'REF', u'STR', u'ARR')[dataType],
@@ -182,14 +184,13 @@ class _xSEChunk(_AChunk):
         with sio(self.chunkData) as ins:
             num_of_masters = unpack_byte(ins) # this won't change
             with sio() as out:
-                def _pack(fmt, *args): out.write(struct_pack(fmt, *args))
-                _pack('B', num_of_masters)
+                _pack(out, 'B', num_of_masters)
                 while ins.tell() < len(self.chunkData):
                     modName = GPath(unpack_str16(ins))
                     modName = master_renames_dict.get(modName, modName)
                     modname_str = encode(modName.s,
                                          firstEncoding=self._esm_encoding)
-                    _pack('=H', len(modname_str))
+                    _pack(out, '=H', len(modname_str))
                     out.write(modname_str)
                 self.chunkData = out.getvalue()
         old_chunk_length = self.chunkLength
@@ -202,26 +203,24 @@ class _PluggyChunk(_AChunk):
         chunkVersion = self.chunkVersion
         chunkBuff = self.chunkData
         chunkTypeNum, = struct_unpack('=I', self.chunkType)
-        def _unpack(fmt, fmt_siz):
-            return struct_unpack(fmt, ins.read(fmt_siz))
         if chunkTypeNum == 1:
             #--Pluggy TypeESP
             log(_(u'    Pluggy ESPs'))
             log(_(u'    EID   ID    Name'))
             while ins.tell() < len(chunkBuff):
                 if chunkVersion == 2:
-                    espId, modId, = _unpack('=BB', 2)
+                    espId, modId, = _unpack(ins, '=BB', 2)
                     log(u'    %02X    %02X' % (espId, modId))
                     espMap[modId] = espId
                 else:  #elif chunkVersion == 1"
-                    espId, modId, modNameLen, = _unpack('=BBI', 6)
+                    espId, modId, modNameLen, = _unpack(ins, '=BBI', 6)
                     modName = ins.read(modNameLen)
                     log(u'    %02X    %02X    %s' % (espId, modId, modName))
                     espMap[modId] = modName  # was [espId]
         elif chunkTypeNum == 2:
             #--Pluggy TypeSTR
             log(_(u'    Pluggy String'))
-            strId, modId, strFlags, = _unpack('=IBB', 6)
+            strId, modId, strFlags, = _unpack(ins, '=IBB', 6)
             strData = ins.read(len(chunkBuff) - ins.tell())
             log(u'      ' + _(u'StrID :') + u' %u' % strId)
             log(u'      ' + _(u'ModID :') + u' %02X %s' % (
@@ -231,14 +230,14 @@ class _PluggyChunk(_AChunk):
         elif chunkTypeNum == 3:
             #--Pluggy TypeArray
             log(_(u'    Pluggy Array'))
-            arrId, modId, arrFlags, arrSize, = _unpack('=IBBI', 10)
+            arrId, modId, arrFlags, arrSize, = _unpack(ins, '=IBBI', 10)
             log(_(u'      ArrID : %u') % (arrId,))
             log(_(u'      ModID : %02X %s') % (
                 modId, espMap[modId] if modId in espMap else u'ERROR',))
             log(_(u'      Flags : %u') % (arrFlags,))
             log(_(u'      Size  : %u') % (arrSize,))
             while ins.tell() < len(chunkBuff):
-                elemIdx, elemType, = _unpack('=IB', 5)
+                elemIdx, elemType, = _unpack(ins, '=IB', 5)
                 elemStr = ins.read(4)
                 if elemType == 0:  #--Integer
                     elem, = struct_unpack('=i', elemStr)
@@ -252,7 +251,7 @@ class _PluggyChunk(_AChunk):
         elif chunkTypeNum == 4:
             #--Pluggy TypeName
             log(_(u'    Pluggy Name'))
-            refId, = _unpack('=I', 4)
+            refId, = _unpack(ins, '=I', 4)
             refName = ins.read(len(chunkBuff) - ins.tell())
             newName = u''
             for c in refName:
@@ -265,7 +264,7 @@ class _PluggyChunk(_AChunk):
             log(_(u'    Pluggy ScreenSize'))
             #UNTESTED - uncomment following line to skip this record type
             #continue
-            scrW, scrH, = _unpack('=II', 8)
+            scrW, scrH, = _unpack(ins, '=II', 8)
             log(_(u'      Width  : %u') % scrW)
             log(_(u'      Height : %u') % scrH)
         elif chunkTypeNum == 6:
@@ -275,7 +274,7 @@ class _PluggyChunk(_AChunk):
             #continue
             hudSid, modId, hudFlags, hudRootID, hudShow, hudPosX, hudPosY, \
             hudDepth, hudScaleX, hudScaleY, hudAlpha, hudAlignment, \
-            hudAutoScale, = _unpack('=IBBBBffhffBBB', 29)
+            hudAutoScale, = _unpack(ins, '=IBBBBffhffBBB', 29)
             hudFileName = decode(ins.read(len(chunkBuff) - ins.tell()))
             log(u'      ' + _(u'HudSID :') + u' %u' % hudSid)
             log(u'      ' + _(u'ModID  :') + u' %02X %s' % (
@@ -297,13 +296,13 @@ class _PluggyChunk(_AChunk):
             #UNTESTED - uncomment following line to skip this record type
             #continue
             hudTid, modId, hudFlags, hudShow, hudPosX, hudPosY, hudDepth, \
-                = _unpack('=IBBBffh', 17)
+                = _unpack(ins, '=IBBBffh', 17)
             hudScaleX, hudScaleY, hudAlpha, hudAlignment, hudAutoScale, \
-            hudWidth, hudHeight, hudFormat, = _unpack('=ffBBBIIB', 20)
-            hudFontNameLen, = _unpack('=I', 4)
+            hudWidth, hudHeight, hudFormat, = _unpack(ins, '=ffBBBIIB', 20)
+            hudFontNameLen, = _unpack(ins, '=I', 4)
             hudFontName = decode(ins.read(hudFontNameLen))
             hudFontHeight, hudFontWidth, hudWeight, hudItalic, hudFontR, \
-            hudFontG, hudFontB, = _unpack('=IIhBBBB', 14)
+            hudFontG, hudFontB, = _unpack(ins, '=IIhBBBB', 14)
             hudText = decode(ins.read(len(chunkBuff) - ins.tell()))
             log(u'      ' + _(u'HudTID :') + u' %u' % hudTid)
             log(u'      ' + _(u'ModID  :') + u' %02X %s' % (
@@ -335,15 +334,11 @@ class _PluggyChunk(_AChunk):
             return # TODO confirm this is the espm chunk for Pluggy
         with sio(self.chunkData) as ins:
             with sio() as out:
-                def _unpack(fmt, fmt_siz):
-                    return struct_unpack(fmt, ins.read(fmt_siz))
-                def _pack(fmt, *args):
-                    out.write(struct_pack(fmt, *args))
                 while ins.tell() < len(self.chunkData):
-                    espId, modId, modNameLen, = _unpack('=BBI', 6)
+                    espId, modId, modNameLen, = _unpack(ins, '=BBI', 6)
                     modName = GPath(ins.read(modNameLen))
                     modName = master_renames_dict.get(modName, modName)
-                    _pack('=BBI', espId, modId, len(modName.s))
+                    _pack(out, '=BBI', espId, modId, len(modName.s))
                     out.write(encode(modName.cs, ##: why LowerCase ??
                                      firstEncoding=self._esm_encoding))
                 self.chunkData = out.getvalue()
@@ -430,21 +425,20 @@ class xSECoSave(ACoSaveFile):
     def write_cosave(self, out_path):
         mtime = self.cosave_path.mtime # must exist !
         with sio() as buff:
-            def _pack(fmt, *args): buff.write(struct_pack(fmt, *args))
             buff.write(self.__class__.signature)
-            _pack('=I', self.cosave_header.formatVersion)
-            _pack('=H', self.cosave_header.obseVersion)
-            _pack('=H', self.cosave_header.obseMinorVersion)
-            _pack('=I', self.cosave_header.oblivionVersion)
+            _pack(buff, '=I', self.cosave_header.formatVersion)
+            _pack(buff, '=H', self.cosave_header.obseVersion)
+            _pack(buff, '=H', self.cosave_header.obseMinorVersion)
+            _pack(buff, '=I', self.cosave_header.oblivionVersion)
             #--Plugins
-            _pack('=I', len(self.plugin_chunks))
+            _pack(buff,'=I', len(self.plugin_chunks))
             for plugin_ch in self.plugin_chunks: # type: _PluginChunk
-                _pack('=I', plugin_ch.plugin_signature)
-                _pack('=I', plugin_ch.num_plugin_chunks)
-                _pack('=I', plugin_ch.plugin_data_size)
+                _pack(buff, '=I', plugin_ch.plugin_signature)
+                _pack(buff, '=I', plugin_ch.num_plugin_chunks)
+                _pack(buff, '=I', plugin_ch.plugin_data_size)
                 for chunk in plugin_ch.plugin_chunks: # type: _AChunk
                     buff.write(chunk.chunkType)
-                    _pack('=2I', chunk.chunkVersion, chunk.chunkLength)
+                    _pack(buff, '=2I', chunk.chunkVersion, chunk.chunkLength)
                     buff.write(chunk.chunkData)
             text = buff.getvalue()
         with out_path.open('wb') as out:
@@ -529,24 +523,22 @@ class PluggyFile(ACoSaveFile):
                                 crc32, crcNew))
         #--Header
         with sio(buff) as ins:
-            def _unpack(fmt, fmt_siz):
-                return struct_unpack(fmt, ins.read(fmt_siz))
             if ins.read(10) != 'PluggySave':
                 raise FileError(self.cosave_path.tail, u'File tag != "PluggySave"')
-            self.version, = _unpack('I',4)
+            self.version, = _unpack(ins, 'I', 4)
             #--Reject versions earlier than 1.02
             if self.version < 0x01020000:
                 raise FileError(self.cosave_path.tail,
                                 u'Unsupported file version: %X' % self.version)
             #--Plugins
             self._plugins = []
-            type, = _unpack('=B',1)
+            type, = _unpack(ins, '=B', 1)
             if type != 0:
                 raise FileError(self.cosave_path.tail,
                                 u'Expected plugins record, but got %d.' % type)
-            count, = _unpack('=I',4)
+            count, = _unpack(ins, '=I', 4)
             for x in range(count):
-                espid,index,modLen = _unpack('=2BI',6)
+                espid,index,modLen = _unpack(ins, '=2BI', 6)
                 modName = GPath(decode(ins.read(modLen)))
                 self._plugins.append((espid, index, modName))
             #--Other
@@ -563,22 +555,20 @@ class PluggyFile(ACoSaveFile):
         #--Buffer
         with sio() as buff:
             #--Save
-            def _pack(fmt, *args):
-                buff.write(struct_pack(fmt, *args))
             buff.write('PluggySave')
-            _pack('=I',self.version)
+            _pack(buff, '=I', self.version)
             #--Plugins
-            _pack('=B',0)
-            _pack('=I', len(self._plugins))
+            _pack(buff, '=B', 0)
+            _pack(buff, '=I', len(self._plugins))
             for (espid,index,modName) in self._plugins:
                 modName = encode(modName.cs)
-                _pack('=2BI',espid,index,len(modName))
+                _pack(buff, '=2BI', espid, index, len(modName))
                 buff.write(modName)
             #--Other
             buff.write(self.other)
             #--End control
             buff.seek(-4,1)
-            _pack('=I',buff.tell())
+            _pack(buff, '=I', buff.tell())
             #--Save
             path = path or self.cosave_path
             mtime = mtime or path.exists() and path.mtime
