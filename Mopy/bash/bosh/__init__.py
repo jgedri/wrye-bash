@@ -1041,7 +1041,7 @@ class SaveInfo(FileInfo):
         return save_paths
 
     def get_cosave(self):
-        """:rtype: cosaves.ACoSaveFile"""
+        """:rtype: cosaves.xSECoSave"""
         cosave_path = self.get_se_cosave_path()
         if cosave_path is None: return None
         try:

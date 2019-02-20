@@ -31,7 +31,7 @@ from ..bolt import sio, GPath, decode, encode, unpack_string, unpack_int, \
     struct_unpack, deprint
 from ..exception import FileError
 
-class CoSaveHeader(object):
+class _xSEHeader(object):
     __slots__ = ('signature', 'formatVersion', 'obseVersion',
                  'obseMinorVersion', 'oblivionVersion', 'numPlugins')
     # numPlugins: the xSE plugins the cosave knows about - including xSE itself
@@ -46,7 +46,7 @@ class CoSaveHeader(object):
         self.oblivionVersion = unpack_int(ins)
         self.numPlugins = unpack_int(ins)
 
-class _Chunk(object):
+class _AChunk(object):
     __slots__ = ('chunkType', 'chunkVersion', 'chunkLength', 'chunkData')
     _esm_encoding = 'cp1252' # TODO ask!
 
@@ -70,7 +70,7 @@ class _Chunk(object):
         :param plugin_chunk: the plugin_chunk this chunk belongs to
         """
 
-class _SEChunk(_Chunk):
+class _xSEChunk(_AChunk):
     _espm_chunk_type = {'SDOM'}
 
     def log_chunk(self, log, ins, save_masters, espmMap):
@@ -164,7 +164,7 @@ class _SEChunk(_Chunk):
         self.chunkLength = len(self.chunkData)
         plugin_chunk.plugin_data_size += self.chunkLength - old_chunk_length # Todo Test
 
-class _PluggyChunk(_Chunk):
+class _PluggyChunk(_AChunk):
 
     def log_chunk(self, log, ins, save_masters, espMap):
         chunkVersion = self.chunkVersion
@@ -320,7 +320,7 @@ class _PluggyChunk(_Chunk):
         plugin_chunk.plugin_data_size += self.chunkLength - old_chunk_length # Todo Test
 
 class _PluginChunk(object):
-    """Info on a xSE plugin in the save - composed of _Chunk units"""
+    """Info on a plugin in the save - composed of _AChunk units"""
     __slots__ = ('plugin_signature', 'num_plugin_chunks', 'plugin_data_size',
                  'plugin_chunks')
 
@@ -335,21 +335,26 @@ class _PluginChunk(object):
             self.plugin_chunks.append(chunk_type(ins))
 
     def _get_plugin_chunk_type(self, xse_signature, pluggy_signature):
-        if self.plugin_signature == xse_signature: return _SEChunk
+        if self.plugin_signature == xse_signature: return _xSEChunk
         if self.plugin_signature == pluggy_signature: return _PluggyChunk
-        return _Chunk
+        return _AChunk
 
 class ACoSaveFile(object):
+    __slots__ = ('cosave_path',)
+
+    def __init__(self, cosave_path):
+        self.cosave_path = cosave_path
+
+class xSECoSave(ACoSaveFile):
     signature = 'OVERRIDE' # the cosave file signature, OBSE, SKSE etc
     _xse_signature = 0x1400 # signature (aka opcodeBase) of xSE plugin itself
     _pluggy_signature = None # signature (aka opcodeBase) of Pluggy plugin
-    __slots__ = ('cosave_path', 'cosave_header', 'plugin_chunks')
+    __slots__ = ('cosave_header', 'plugin_chunks')
 
     def __init__(self, cosave_path):
-        # super(ACoSaveFile, self).__init__(cosave_path)
-        self.cosave_path = cosave_path
+        super(xSECoSave, self).__init__(cosave_path)
         with open(u'%s' % cosave_path, 'rb') as ins:
-            self.cosave_header = CoSaveHeader(ins, cosave_path, self.signature)
+            self.cosave_header = _xSEHeader(ins, cosave_path, self.signature)
             self.plugin_chunks = []
             for x in xrange(self.cosave_header.numPlugins):
                 self.plugin_chunks.append(_PluginChunk(
@@ -379,7 +384,7 @@ class ACoSaveFile(object):
             log(_(u'  Type  Ver   Size'))
             log(u'-' * 80)
             espMap = {}
-            for ch in plugin_ch.plugin_chunks: # type: _Chunk
+            for ch in plugin_ch.plugin_chunks: # type: _AChunk
                 chunkTypeNum, = struct_unpack('=I',ch.chunkType)
                 if ch.chunkType[0] >= ' ' and ch.chunkType[3] >= ' ': # HUH ?
                     log(u'  %4s  %-4u  %08X' % (
@@ -405,7 +410,7 @@ class ACoSaveFile(object):
                 _pack('=I', plugin_ch.plugin_signature)
                 _pack('=I', plugin_ch.num_plugin_chunks)
                 _pack('=I', plugin_ch.plugin_data_size)
-                for chunk in plugin_ch.plugin_chunks: # type: _Chunk
+                for chunk in plugin_ch.plugin_chunks: # type: _AChunk
                     buff.write(chunk.chunkType)
                     _pack('=2I', chunk.chunkVersion, chunk.chunkLength)
                     buff.write(chunk.chunkData)
@@ -420,21 +425,21 @@ class ACoSaveFile(object):
         self.write_cosave(self.cosave_path.temp)
         self.cosave_path.untemp()
 
-class ObseCosave(ACoSaveFile):
+class ObseCosave(xSECoSave):
     signature = 'OBSE'
     _pluggy_signature = 0x2330
 
-class SkseCosave(ACoSaveFile):
+class SkseCosave(xSECoSave):
     signature = 'SKSE'
     _xse_signature = 0x0
 
 class F4seCosave(SkseCosave):
     signature = 'F4SE'
 
-class NvseCosave(ACoSaveFile):
+class NvseCosave(xSECoSave):
     signature = 'NVSE'
 
-class FoseCosave(ACoSaveFile):
+class FoseCosave(xSECoSave):
     signature = 'FOSE'
 
 # Factory
@@ -445,10 +450,10 @@ def get_cosave_type(game_fsName):
     elif game_fsName == u'Skyrim':
         return SkseCosave
     elif game_fsName == u'Skyrim Special Edition':
-        _SEChunk._espm_chunk_type = {'SDOM', 'DOML'}
+        _xSEChunk._espm_chunk_type = {'SDOM', 'DOML'}
         return SkseCosave
     elif game_fsName == u'Fallout4':
-        _SEChunk._espm_chunk_type = {'SDOM', 'DOML'}
+        _xSEChunk._espm_chunk_type = {'SDOM', 'DOML'}
         return F4seCosave
     elif game_fsName == u'Fallout3':
         return FoseCosave
@@ -457,12 +462,10 @@ def get_cosave_type(game_fsName):
     return None
 
 #------------------------------------------------------------------------------
-class PluggyFile:
+class PluggyFile(ACoSaveFile):
     """Represents a .pluggy cofile for saves. Used for editing masters list."""
-    def __init__(self,path):
-        self.path = path
-        self.name = path.tail
-        self.tag = None
+    def __init__(self, cosave_path):
+        super(PluggyFile, self).__init__(cosave_path)
         self.version = None
         self._plugins = None
         self.other = None
@@ -471,19 +474,19 @@ class PluggyFile:
     def mapMasters(self,masterMap):
         """Update plugin names according to masterMap."""
         if not self.valid:
-            raise FileError(self.path.tail, u"File not initialized.")
+            raise FileError(self.cosave_path.tail, u"File not initialized.")
         self._plugins = [(x, y, masterMap.get(z,z)) for x,y,z in self._plugins]
 
     def load(self):
         """Read file."""
         import binascii
-        path_size = self.path.size
-        with self.path.open('rb') as ins:
+        path_size = self.cosave_path.size
+        with self.cosave_path.open('rb') as ins:
             buff = ins.read(path_size-4)
             crc32, = struct_unpack('=i', ins.read(4))
         crcNew = binascii.crc32(buff)
         if crc32 != crcNew:
-            raise FileError(self.path.tail,
+            raise FileError(self.cosave_path.tail,
                             u'CRC32 file check failed. File: %X, Calc: %X' % (
                                 crc32, crcNew))
         #--Header
@@ -491,17 +494,17 @@ class PluggyFile:
             def _unpack(fmt, fmt_siz):
                 return struct_unpack(fmt, ins.read(fmt_siz))
             if ins.read(10) != 'PluggySave':
-                raise FileError(self.path.tail, u'File tag != "PluggySave"')
+                raise FileError(self.cosave_path.tail, u'File tag != "PluggySave"')
             self.version, = _unpack('I',4)
             #--Reject versions earlier than 1.02
             if self.version < 0x01020000:
-                raise FileError(self.path.tail,
+                raise FileError(self.cosave_path.tail,
                                 u'Unsupported file version: %X' % self.version)
             #--Plugins
             self._plugins = []
             type, = _unpack('=B',1)
             if type != 0:
-                raise FileError(self.path.tail,
+                raise FileError(self.cosave_path.tail,
                                 u'Expected plugins record, but got %d.' % type)
             count, = _unpack('=I',4)
             for x in range(count):
@@ -510,7 +513,7 @@ class PluggyFile:
                 self._plugins.append((espid, index, modName))
             #--Other
             self.other = ins.getvalue()[ins.tell():]
-        deprint(struct_unpack('I', self.other[-4:]), self.path.size-8)
+        deprint(struct_unpack('I', self.other[-4:]), self.cosave_path.size-8)
         #--Done
         self.valid = True
 
@@ -518,7 +521,7 @@ class PluggyFile:
         """Saves."""
         import binascii
         if not self.valid:
-            raise FileError(self.path.tail, u"File not initialized.")
+            raise FileError(self.cosave_path.tail, u"File not initialized.")
         #--Buffer
         with sio() as buff:
             #--Save
@@ -539,7 +542,7 @@ class PluggyFile:
             buff.seek(-4,1)
             _pack('=I',buff.tell())
             #--Save
-            path = path or self.path
+            path = path or self.cosave_path
             mtime = mtime or path.exists() and path.mtime
             text = buff.getvalue()
             with path.open('wb') as out:
@@ -549,5 +552,5 @@ class PluggyFile:
 
     def safeSave(self):
         """Save data to file safely."""
-        self.save(self.path.temp,self.path.mtime)
-        self.path.untemp()
+        self.save(self.cosave_path.temp,self.cosave_path.mtime)
+        self.cosave_path.untemp()
