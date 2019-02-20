@@ -367,25 +367,30 @@ class _PluginChunk(object):
         return _AChunk
 
 class ACoSaveFile(object):
-    __slots__ = ('cosave_path',)
+    chunk_type = _AChunk
+    header_type = _AHeader
+    __slots__ = ('cosave_path', 'cosave_header', 'plugin_chunks')
 
     def __init__(self, cosave_path):
         self.cosave_path = cosave_path
+        with cosave_path.open('rb') as ins:
+            self.cosave_header = self.header_type(ins, cosave_path)
+            self.plugin_chunks = []
+            for _ in xrange(self.num_plugins):
+                self.plugin_chunks.append(self.chunk_type(ins))
+
+    @property
+    def num_plugins(self):
+        return 0
 
 class xSECoSave(ACoSaveFile):
+    chunk_type = _xSEChunk
+    header_type = _xSEHeader
+
     signature = 'OVERRIDE' # the cosave file signature, OBSE, SKSE etc
     _xse_signature = 0x1400 # signature (aka opcodeBase) of xSE plugin itself
     _pluggy_signature = None # signature (aka opcodeBase) of Pluggy plugin
     __slots__ = ('cosave_header', 'plugin_chunks')
-
-    def __init__(self, cosave_path):
-        super(xSECoSave, self).__init__(cosave_path)
-        with open(u'%s' % cosave_path, 'rb') as ins:
-            self.cosave_header = _xSEHeader(ins, cosave_path)
-            self.plugin_chunks = []
-            for x in xrange(self.cosave_header.numPlugins):
-                self.plugin_chunks.append(_PluginChunk(
-                    ins, self._xse_signature, self._pluggy_signature))
 
     def map_masters(self, master_renames_dict):
         for plugin_chunk in self.plugin_chunks:
@@ -496,6 +501,9 @@ def get_cosave_type(game_fsName):
 #------------------------------------------------------------------------------
 class PluggyFile(ACoSaveFile):
     """Represents a .pluggy cofile for saves. Used for editing masters list."""
+    chunk_type = _PluggyChunk
+    header_type = _PluggyHeader
+
     def __init__(self, cosave_path):
         super(PluggyFile, self).__init__(cosave_path)
         self.version = None
