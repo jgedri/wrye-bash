@@ -475,7 +475,10 @@ tab. The directories skipped are:
 <h3 id="bain-commands">Context Menu Commands</h3>
 <div class="prlflex clearf">
     <figure class="slideshow" style="width:525px; min-height:656px">
-        <img alt="Installer Header Menu" src="../bash/images/readme/installers-rclick-header-menu-1.png"> <img alt="Installer Header Menu" src="../bash/images/readme/installers-rclick-header-menu-2.png"> <img alt="Installer Header Menu" src="../bash/images/readme/installers-rclick-header-menu-3.png"> <img alt="Installer Header Menu" src="../bash/images/readme/installers-rclick-header-menu-4.png">
+        <img alt="Installer Header Menu" src="../bash/images/readme/installers-rclick-header-menu-1.png">
+        <img alt="Installer Header Menu" src="../bash/images/readme/installers-rclick-header-menu-2.png">
+        <img alt="Installer Header Menu" src="../bash/images/readme/installers-rclick-header-menu-3.png">
+        <img alt="Installer Header Menu" src="../bash/images/readme/installers-rclick-header-menu-4.png">
     </figure>
 <table id="bainHeaderCommands">
     <thead>
@@ -602,7 +605,13 @@ tab. The directories skipped are:
 </div>
 <div class="prlflex clearf">
     <figure class="slideshow" style="width:413px; min-height:445px">
-        <img alt="Installer Package Menu" src="../bash/images/readme/installers-rclick-installer-menu-1.png"> <img alt="Installer Package Menu" src="../bash/images/readme/installers-rclick-installer-menu-2.png"> <img alt="Installer Package Menu" src="../bash/images/readme/installers-rclick-installer-menu-3.png"> <img alt="Installer Package Menu" src="../bash/images/readme/installers-rclick-installer-menu-4.png"> <img alt="Installer Package Menu" src="../bash/images/readme/installers-rclick-installer-menu-5.png"> <img alt="Installer Package Menu" src="../bash/images/readme/installers-rclick-installer-menu-6.png"> <img alt="Installer Package Menu" src="../bash/images/readme/installers-rclick-installer-menu-7.png">
+        <img alt="Installer Package Menu" src="../bash/images/readme/installers-rclick-installer-menu-1.png">
+        <img alt="Installer Package Menu" src="../bash/images/readme/installers-rclick-installer-menu-2.png">
+        <img alt="Installer Package Menu" src="../bash/images/readme/installers-rclick-installer-menu-3.png">
+        <img alt="Installer Package Menu" src="../bash/images/readme/installers-rclick-installer-menu-4.png">
+        <img alt="Installer Package Menu" src="../bash/images/readme/installers-rclick-installer-menu-5.png">
+        <img alt="Installer Package Menu" src="../bash/images/readme/installers-rclick-installer-menu-6.png">
+        <img alt="Installer Package Menu" src="../bash/images/readme/installers-rclick-installer-menu-7.png">
     </figure>
 <table id="bainPackageCommands">
     <thead>
@@ -867,19 +876,19 @@ tab. The directories skipped are:
     <thead>
         <tr><th>Checkbox Colour<th>Meaning
     <tbody>
-        <tr><td><img src="../bash/images/checkbox_blue_on.png" alt="Blue"/><td>Good. Matches the Master Index of the the Current load order.
-        <tr><td><img src="../bash/images/checkbox_green_on.png" alt="Green"/><td>Good, but the Master Index is not in sync with the Current
+        <tr><td><img alt="Blue" src="../bash/images/checkbox_blue_on.png"/><td>Good. Matches the Master Index of the the Current load order.
+        <tr><td><img alt="Green" src="../bash/images/checkbox_green_on.png"/><td>Good, but the Master Index is not in sync with the Current
             load order.<br />
             <br />So for instance if you have a load order with active mods (in this order) [Oblivion.esm, displayed_mod.esm, yet_some-other.esp,
             some_other.esp, some_other2.esp, displayed_mod.esp], some_other.esp will display in green as its current load order is 3 while its
             master index is 2. Note that the <em>relative load order of masters</em> is the same as it is in the MI list.
-        <tr><td><img src="../bash/images/checkbox_orange_on.png" alt="Orange"/><td>The plugin loads in a different order compared to its order in
+        <tr><td><img alt="Orange" src="../bash/images/checkbox_orange_on.png"/><td>The plugin loads in a different order compared to its order in
             the master array of displayed_mod.esp<br />
             <br />So for instance if you have a load order with active mods (in this order) [Oblivion.esm, displayed_mod.esm, some_other2.esp,
             some_other.esp, displayed_mod.esp], some_other.esp and some_other2.esp will display in orange as they load in different
             <em>relative order</em> than they are recorded in the master array of displayed_mod.esp.<br />
         <br />If a plugin has two masters that are siblings (one doesn't have the other as a master, so they can load in either order) and they are overriding the same record from an earlier master (e.g. both are overriding a record from the main game master file), then loading them in a different order will result in a different version of the overridden record being the "winner". But the plugin might depend on the winner being the one indicated by the order in which it references the masters. The plugin should be examined in xEdit (meaning any version) to see if it is best to alter the load order or if Sort Masters should be used to correct the issue.
-        <tr><td><img src="../bash/images/checkbox_red_on.png" alt="Red"/><td>A Master that is missing. If unintended then you should check to make
+        <tr><td><img alt="Red" src="../bash/images/checkbox_red_on.png"/><td>A Master that is missing. If unintended then you should check to make
             sure that you have not inadvertently renamed or removed the plugin.
 </table>
 
@@ -4200,7 +4209,6 @@ and masterlist relative priority and role see the LOOT docs.
 
 
 <h2 id="saves">Saves Tab</h2>
-
 <h3 id="saves-overview">Overview</h3>
 <figure>
         <img alt="Saves Tab" src="../bash/images/readme/saves.png">
@@ -4248,11 +4256,11 @@ and masterlist relative priority and role see the LOOT docs.
     <thead>
         <tr><th>Checkbox Colour<th>Meaning
     <tbody>
-        <tr><td><img src="../bash/images/checkbox_purple_on.png" alt="Purple"/><td>Excellent. Exactly synced with the current load order.
-        <tr><td><img src="../bash/images/checkbox_blue_on.png" alt="Blue"/><td>Good. Compatible with the current load order. However, the current load order includes some plugins that are not used by this save game.
-        <tr><td><img src="../bash/images/checkbox_green_on.png" alt="Green"/><td>Good, but not in sync with the current load order. Use <a href="#savesLoadMasters">Load Masters</a> to sync load order to this save.
-        <tr><td><img src="../bash/images/checkbox_orange_on.png" alt="Orange"/><td>Some plugins have changed order. the game and the Construction Set/Creation Kit will adjust for this when loaded. However, if some of the plugins that you depend made conflicting changes to the same item, a different plugin may now dominate because of the reordering.
-        <tr><td><img src="../bash/images/checkbox_red_on.png" alt="Red"/><td>A master is missing. You should check to make sure that you have not inadvertently renamed or removed the plugin.
+        <tr><td><img alt="Purple" src="../bash/images/checkbox_purple_on.png"/><td>Excellent. Exactly synced with the current load order.
+        <tr><td><img alt="Blue" src="../bash/images/checkbox_blue_on.png"/><td>Good. Compatible with the current load order. However, the current load order includes some plugins that are not used by this save game.
+        <tr><td><img alt="Green" src="../bash/images/checkbox_green_on.png"/><td>Good, but not in sync with the current load order. Use <a href="#savesLoadMasters">Load Masters</a> to sync load order to this save.
+        <tr><td><img alt="Orange" src="../bash/images/checkbox_orange_on.png"/><td>Some plugins have changed order. the game and the Construction Set/Creation Kit will adjust for this when loaded. However, if some of the plugins that you depend made conflicting changes to the same item, a different plugin may now dominate because of the reordering.
+        <tr><td><img alt="Red" src="../bash/images/checkbox_red_on.png"/><td>A master is missing. You should check to make sure that you have not inadvertently renamed or removed the plugin.
 </table>
 
 <h3 id="saves-masters-symbols">Color scheme for Save Game Masters (MI &amp; Current LO)</h3>
@@ -4260,10 +4268,10 @@ and masterlist relative priority and role see the LOOT docs.
     <thead>
         <tr><th>Checkbox Colour<th>Meaning
     <tbody>
-        <tr><td><img src="../bash/images/checkbox_blue_on.png" alt="Blue"/><td>Good. Matches the Master Index of the save game at the time it was saved.
-        <tr><td><img src="../bash/images/checkbox_green_on.png" alt="Green"/><td>Good, but the Master Index is not in sync with the Current load order.
-        <tr><td><img src="../bash/images/checkbox_orange_on.png" alt="Orange"/><td>Some plugins have changed order. The plugin still exists in the Data folder but a plugin was added or removed before of after this plugin.
-        <tr><td><img src="../bash/images/checkbox_red_on.png" alt="Red"/><td>A plugin is missing. If unintended then you should check to make sure that you have not inadvertently renamed or removed the plugin.
+        <tr><td><img alt="Blue" src="../bash/images/checkbox_blue_on.png"/><td>Good. Matches the Master Index of the save game at the time it was saved.
+        <tr><td><img alt="Green" src="../bash/images/checkbox_green_on.png"/><td>Good, but the Master Index is not in sync with the Current load order.
+        <tr><td><img alt="Orange" src="../bash/images/checkbox_orange_on.png"/><td>Some plugins have changed order. The plugin still exists in the Data folder but a plugin was added or removed before of after this plugin.
+        <tr><td><img alt="Red" src="../bash/images/checkbox_red_on.png"/><td>A plugin is missing. If unintended then you should check to make sure that you have not inadvertently renamed or removed the plugin.
 </table>
 
 <h3 id="saves-profiles">Save Profiles</h3>
@@ -4424,8 +4432,8 @@ and masterlist relative priority and role see the LOOT docs.
 <h2 id="screenshots">Screenshots Tab</h2>
 <h3 id="screenshots-overview">Overview</h3>
 <figure class="slideshow">
-<img src="../bash/images/readme/screenshots-1.png" alt="Screenshots Tab"/>
-<img src="../bash/images/readme/screenshots-2.png" alt="Screenshots Tab"/>
+<img alt="Screenshots Tab" src="../bash/images/readme/screenshots-1.png"/>
+<img alt="Screenshots Tab" src="../bash/images/readme/screenshots-2.png"/>
 <figcaption class="screenshots-overview-figcap">Wrye Bash's Screenshots tab.</figcaption>
 </figure>
 <p>The Screenshots tab allows you to preview any screenshots taken in-game using the built-in Print Screen functionality. These screenshots are saved as bitmap files (.bmp). Selecting a screenshot from the list on the left will display it on the right. Screenshots can be converted from bitmaps into a few other formats using context menu commands.
@@ -4479,10 +4487,10 @@ and masterlist relative priority and role see the LOOT docs.
 <h2 id="launchers">Advanced Launchers</h2>
 <h3 id="launchers-hide">Hiding Launchers</h3>
 <figure class="slideshow">
-<img src="../bash/images/readme/toolbar-11-rclick-hide-gamelauncher.png" alt="toolbar hide launcher"/>
-<img src="../bash/images/readme/toolbar-12-rclick-hide-autoquit.png" alt="toolbar hide launcher"/>
-<img src="../bash/images/readme/toolbar-13-rclick-hide-obse-toggle.png" alt="toolbar hide launcher"/>
-<img src="../bash/images/readme/toolbar-12-rclick-hide-boss.png" alt="toolbar hide launcher"/>
+<img alt="toolbar hide launcher" src="../bash/images/readme/toolbar-11-rclick-hide-gamelauncher.png"/>
+<img alt="toolbar hide launcher" src="../bash/images/readme/toolbar-12-rclick-hide-autoquit.png"/>
+<img alt="toolbar hide launcher" src="../bash/images/readme/toolbar-13-rclick-hide-obse-toggle.png"/>
+<img alt="toolbar hide launcher" src="../bash/images/readme/toolbar-12-rclick-hide-boss.png"/>
 <figcaption class="launchers-hide-figcap">The Hide option in the right-click menu for launchers.</figcaption>
 </figure>
 <p>You can hide specific launcher icons, preventing them from being displayed, by right-clicking them and selecting <q>Hide...</q> or by inserting a semicolon before their path in the <q>bash.ini</q>.
@@ -4511,8 +4519,8 @@ and masterlist relative priority and role see the LOOT docs.
 <h2 id="people">People Tab</h2>
 <h3 id="people-overview">Overview</h3>
 <figure class="slideshow">
-<img src="../bash/images/readme/people-1.png" alt="People tab"/>
-<img src="../bash/images/readme/people-2.png" alt="People tab"/>
+<img alt="People tab" src="../bash/images/readme/people-1.png"/>
+<img alt="People tab" src="../bash/images/readme/people-2.png"/>
 <figcaption class="people-overview-figcap">Wrye Bash's People tab.</figcaption>
 </figure>
 <p>The People tab functions as a simple database that can be used to keep notes on various people (eg. why you blocked a forum user, or what a good mod someone made).
@@ -4528,13 +4536,13 @@ and masterlist relative priority and role see the LOOT docs.
         <tr><th colspan="2">Checkbox Colours
         <tr><th>Checkbox<th>Meaning
     <tbody>
-        <tr><td><img src="../bash/images/checkbox_purple_inc.png" alt="Purple"/><td>Person has +5 karma.
-        <tr><td><img src="../bash/images/checkbox_blue_inc.png" alt="Blue"/><td>Person has +3 or +4 karma.
-        <tr><td><img src="../bash/images/checkbox_green_inc.png" alt="Green"/><td>Person has +1 or +2 karma.
-        <tr><td><img src="../bash/images/checkbox_grey_off.png" alt="Grey"/><td>Person has 0 karma.
-        <tr><td><img src="../bash/images/checkbox_yellow_off.png" alt="Yellow"/><td>Person has -1 or -2 karma.
-        <tr><td><img src="../bash/images/checkbox_orange_off.png" alt="Orange"/><td>Person has -3 or -4 karma.
-        <tr><td><img src="../bash/images/checkbox_red_off.png" alt="Red"/><td>Person has -5 karma.
+        <tr><td><img alt="Purple" src="../bash/images/checkbox_purple_inc.png"/><td>Person has +5 karma.
+        <tr><td><img alt="Blue" src="../bash/images/checkbox_blue_inc.png"/><td>Person has +3 or +4 karma.
+        <tr><td><img alt="Green" src="../bash/images/checkbox_green_inc.png"/><td>Person has +1 or +2 karma.
+        <tr><td><img alt="Grey" src="../bash/images/checkbox_grey_off.png"/><td>Person has 0 karma.
+        <tr><td><img alt="Yellow" src="../bash/images/checkbox_yellow_off.png"/><td>Person has -1 or -2 karma.
+        <tr><td><img alt="Orange" src="../bash/images/checkbox_orange_off.png"/><td>Person has -3 or -4 karma.
+        <tr><td><img alt="Red" src="../bash/images/checkbox_red_off.png"/><td>Person has -5 karma.
 </table>
 </div>
 <div>
@@ -4559,12 +4567,12 @@ and masterlist relative priority and role see the LOOT docs.
 
 <h3 id="tools-settings">Settings Menu</h3>
 <figure class="slideshow">
-<img src="../bash/images/readme/settings-1-colour_highlighted.png" alt="Colors Dialog"/>
-<img src="../bash/images/readme/settings-2-tabs_highlighted.png" alt="Colors Dialog"/>
-<img src="../bash/images/readme/settings-3-status_bar_and_icon_size_highlighted.png" alt="Colors Dialog"/>
-<img src="../bash/images/readme/settings-4-language_highlighted.png" alt="Colors Dialog"/>
-<img src="../bash/images/readme/settings-5-plugin_encoding_highlighted.png" alt="Colors Dialog"/>
-<img src="../bash/images/readme/settings-6-game_highlighted.png" alt="Colors Dialog"/>
+<img alt="Colors Dialog" src="../bash/images/readme/settings-1-colour_highlighted.png"/>
+<img alt="Colors Dialog" src="../bash/images/readme/settings-2-tabs_highlighted.png"/>
+<img alt="Colors Dialog" src="../bash/images/readme/settings-3-status_bar_and_icon_size_highlighted.png"/>
+<img alt="Colors Dialog" src="../bash/images/readme/settings-4-language_highlighted.png"/>
+<img alt="Colors Dialog" src="../bash/images/readme/settings-5-plugin_encoding_highlighted.png"/>
+<img alt="Colors Dialog" src="../bash/images/readme/settings-6-game_highlighted.png"/>
 <figcaption class="tools-settings-figcap">Wrye Bash's Settings menu.</figcaption>
 </figure>
 <p>The Settings menu is where Wrye Bash's global settings may be accessed. The Settings menu can be opened by clicking on the <a href="Wrye%20Bash%20General%20Readme.html#launchersSettingsMenu">Settings button</a> in the status bar. The Settings menu's items are detailed in the table below.
@@ -4610,7 +4618,8 @@ and masterlist relative priority and role see the LOOT docs.
 <h3 id="tools-colors">Color Configuration</h3>
 <div class="prlflex smltbl clearf">
   <figure class="slideshow" style="width:768px; min-height:390px">
-    <img alt="Colors Dialog" src="../bash/images/readme/settings-1-colours-dialogue-1.png"> <img alt="Colors Dialog" src="../bash/images/readme/settings-1-colours-dialogue-2.png">
+    <img alt="Colors Dialog" src="../bash/images/readme/settings-1-colours-dialogue-1.png">
+    <img alt="Colors Dialog" src="../bash/images/readme/settings-1-colours-dialogue-2.png">
   </figure>
 <table class="tools-colors-table">
     <thead>
@@ -4628,9 +4637,9 @@ and masterlist relative priority and role see the LOOT docs.
 </div>
 <h3 class="clearfb" id="tools-docs">Doc Browser</h3>
 <figure class="slideshow">
-<img src="../bash/images/readme/doc-browser-1.png" alt="doc browser">
-<img src="../bash/images/readme/doc-browser-2.png" alt="doc browser">
-<img src="../bash/images/readme/doc-browser-set-doc-dialogue.png" alt="doc browser">
+<img alt="doc browser" src="../bash/images/readme/doc-browser-1.png">
+<img alt="doc browser" src="../bash/images/readme/doc-browser-2.png">
+<img alt="doc browser" src="../bash/images/readme/doc-browser-set-doc-dialogue.png">
 <figcaption class="tools-docs-figcap">Wrye Bash's Doc Browser.</figcaption>
 </figure>
 <p>The Doc Browser allows you to quickly and easily scan through your mods' documentation. The supported document types are: text files, HTML files and MHT files (HTML archives). To display the Doc Browser, double click any plugin in the main list of the Mods tab.
