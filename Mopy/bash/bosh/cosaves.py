@@ -31,6 +31,7 @@ from ..bolt import sio, GPath, decode, encode, unpack_string, unpack_int, \
     struct_unpack, deprint
 from ..exception import FileError
 
+
 # Small helper functions for quickly packing and unpacking
 def _pack(buff, fmt, *args): buff.write(struct_pack(fmt, *args))
 # TODO(inf) Replace with unpack_many
@@ -353,6 +354,8 @@ class _PluggyChunk(_AChunk):
         chunkTypeNum, = struct_unpack('=I', self.chunkType)
         if chunkTypeNum != 1:
             return # TODO confirm this is the espm chunk for Pluggy
+                   # It is not. 0 is, according to the downloadable save file
+                   # documentation.
         with sio(self.chunkData) as ins:
             with sio() as out:
                 while ins.tell() < len(self.chunkData):
