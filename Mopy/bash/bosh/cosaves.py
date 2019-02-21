@@ -33,6 +33,7 @@ from ..exception import FileError
 
 # Small helper functions for quickly packing and unpacking
 def _pack(buff, fmt, *args): buff.write(struct_pack(fmt, *args))
+# TODO(inf) Replace with unpack_many
 def _unpack(ins, fmt, size): return struct_unpack(fmt, ins.read(size))
 
 class _AHeader(object):
@@ -48,11 +49,21 @@ class _AHeader(object):
         :param ins: The input stream to read from.
         :param cosave_path: The path to the cosave.
         """
+        # TODO Don't we have to use self.__class__.signature?
         actual_signature = unpack_string(ins, len(self.signature))
         if actual_signature != self.signature:
             raise FileError(cosave_path, u'Signature wrong: got %r, but '
                                          u'expected %r' %
                             (actual_signature, self.signature))
+
+    def write_header(self, out):
+        """
+        Writes this header to the specified output stream. The base method just
+        writes the signature.
+
+        :param out: The output stream to write to.
+        """
+        out.write(self.signature)
 
 class _xSEHeader(_AHeader):
     """Header for xSE cosaves."""
@@ -68,6 +79,13 @@ class _xSEHeader(_AHeader):
         self.oblivionVersion = unpack_int(ins)
         self.numPlugins = unpack_int(ins)
 
+    def write_header(self, out):
+        super(_xSEHeader, self).write_header(out)
+        _pack(out, '=I', self.formatVersion)
+        _pack(out, '=H', self.obseVersion)
+        _pack(out, '=H', self.obseMinorVersion)
+        _pack(out, '=I', self.oblivionVersion)
+
 class _PluggyHeader(_AHeader):
     """Header for pluggy cosaves. Just checks signature and version."""
     signature = 'PluggySave'
@@ -75,12 +93,15 @@ class _PluggyHeader(_AHeader):
 
     def __init__(self, ins, cosave_path):
         super(_PluggyHeader, self).__init__(ins, cosave_path)
-        # Taken from pluggy save file format docs
         version = unpack_int(ins)
         if version > 0x0105000:
             raise FileError(cosave_path, u'Version of pluggy save file format '
                                          u'is too new - only versions up to '
                                          u'1.6.0000 are supported.')
+
+    def write_header(self, out):
+        super(_PluggyHeader, self).write_header(out)
+        _pack(out, '=I', 0x0105000)
 
 class _AChunk(object):
     __slots__ = ('chunkType', 'chunkVersion', 'chunkLength', 'chunkData')
@@ -430,11 +451,7 @@ class xSECoSave(ACoSaveFile):
     def write_cosave(self, out_path):
         mtime = self.cosave_path.mtime # must exist !
         with sio() as buff:
-            buff.write(self.__class__.signature)
-            _pack(buff, '=I', self.cosave_header.formatVersion)
-            _pack(buff, '=H', self.cosave_header.obseVersion)
-            _pack(buff, '=H', self.cosave_header.obseMinorVersion)
-            _pack(buff, '=I', self.cosave_header.oblivionVersion)
+            self.cosave_header.write_header(buff)
             #--Plugins
             _pack(buff,'=I', len(self.plugin_chunks))
             for plugin_ch in self.plugin_chunks: # type: _PluginChunk
