@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <link href="assets/bash_main.css" rel="stylesheet" type="text/css">
@@ -173,7 +173,7 @@
 <p>If you are installing the Python version of Wrye Bash and wish to install the Python dependencies separately, the following must be installed.
 <p class="install-components">Note that the 32-bit versions are required even if you are on a 64-bit operating system.
 <ul>
-    <a href="https://www.python.org/ftp/python/2.7.15/python-2.7.15.msi">Python 2.7.15</a>: Versions prior to 2.7.15 may work with Wrye Bash, but have not been tested. Updating is recommended for bug and security fixes.
+    <li><a href="https://www.python.org/ftp/python/2.7.15/python-2.7.15.msi">Python 2.7.15</a>: Versions prior to 2.7.15 may work with Wrye Bash, but have not been tested. Updating is recommended for bug and security fixes.
     <li><a href="http://sourceforge.net/projects/wxpython/files/wxPython/2.8.12.1/wxPython2.8-win32-unicode-2.8.12.1-py27.exe">wxPython 2.8.12.1 Unicode for Python 2.7</a>: (do <strong>not</strong> get a newer version)
     <li><a href="https://sourceforge.net/projects/pywin32/files/pywin32/Build%20220/pywin32-220.win32-py2.7.exe/download">PyWin32</a>: This component is required for Wizards to function. If you do not wish to use Wizards, then it need not be installed.
     <li><a href="http://sourceforge.net/projects/comtypes/files/comtypes/0.6.2/comtypes-0.6.2.win32.exe/download">Comtypes 0.6.2</a>: This is an optional component, it is used to enable rendering of HTML via an ActiveX control.  The  following features are affected if comtypes is not installed:
@@ -313,11 +313,11 @@ tab. The directories skipped are:
         <tr><td>Script extender (see game specific below)<td colspan="2">If <a href="#bainSkipOBSEPlugins">Skip OBSE Plugins</a> is checked
         <tr><td>screenshots<td colspan="2">If <a href="#bainSkipScreenshots">Skip Screenshots</a> is checked (that may change as Skip Screenshots will
             skip a screenshots directory in the package, whose contents would be currently installed in Data/Docs, not Data/Screenshots).
-    <thead><tr><th colspan="3">Skipped file extensions
+        <tr class="tabttl"><th colspan="3">Skipped file extensions
     <tbody>
-        <td colspan="3">.001, .7z, .7z.001, .ace, .bz2, .ckm, .db, .exe, .fomod, .gz, .lzma, .manifest, .omod, .py, .pyc, .rar, .tar, .tb2, .tgz, .zip
-    <thead><tr><th colspan="3">Per game skipped Data subdirectories
-    <thead><tr><th>Game<th>Skipped Data subdirectories<td>Script extender(s) directories
+    <tr><td colspan="3">.001, .7z, .7z.001, .ace, .bz2, .ckm, .db, .exe, .fomod, .gz, .lzma, .manifest, .omod, .py, .pyc, .rar, .tar, .tb2, .tgz, .zip
+    <tr class="tabttl"><th colspan="3">Per game skipped Data subdirectories
+    <tr class="tabttl"><th>Game<th>Skipped Data subdirectories<td>Script extender(s) directories
     <tbody>
         <tr><td>Oblivion<td>tes4edit backups, bgsee, conscribe logs<td>OBSE
         <tr><td>Fallout 3<td>fo3edit backups<td>FOSE
@@ -1119,8 +1119,8 @@ tab. The directories skipped are:
 
 <table>
     <thead>
-        <tr><th colspan="3">Mod's Masters List Column Header Context Menu
-        <tr><th colspan="2">Command<th>Description
+        <tr><td class="thf" colspan="3">Mod's Masters List Column Header Context Menu</td>
+        <tr><td class="thf" colspan="2">Command<td class="thf">Description
     <tbody>
         <tr><td colspan="2">Sort By<td>This submenu allows you to choose by which column the masters list is sorted.
             This is equivalent to clicking on a column header.
@@ -1132,8 +1132,8 @@ tab. The directories skipped are:
 
 <table>
     <thead>
-        <tr><th colspan="3">Mod's Masters List Items Context Menu
-        <tr><th colspan="2">Command<th>Description
+        <tr><td class="thf" colspan="3">Mod's Masters List Items Context Menu
+        <tr><td class="thf" colspan="2">Command<td class="thf">Description
     <tbody>
         <tr><td colspan="2">Change To...<td>Rename a master by selecting the desired replacement esp/esm from the mods directory. It will add the
             plugin to the internal renames dictionary of Bash and bold it on any master list that it appears. Hit Save to edit the selected file
@@ -4392,8 +4392,8 @@ and masterlist relative priority and role see the LOOT docs.
 
 <table>
     <thead>
-        <tr><th colspan="3">Save's Masters List Column Header Context Menu
-        <tr><th colspan="2">Command<th>Description
+        <tr><td class="thf" colspan="3">Save's Masters List Column Header Context Menu
+        <tr><td class="thf" colspan="2">Command<td class="thf">Description
     <tbody>
         <tr><td colspan="2">Sort By<td>This submenu allows you to choose by which column the masters list is sorted.
             This is equivalent to clicking on a column header.
@@ -4405,8 +4405,8 @@ and masterlist relative priority and role see the LOOT docs.
 
 <table>
     <thead>
-        <tr><th colspan="3">Save's Masters List Items Context Menu
-        <tr><th colspan="2">Command<th>Description
+        <tr><td class="thf" colspan="3">Save's Masters List Items Context Menu
+        <tr><td class="thf" colspan="2">Command<td class="thf">Description
     <tbody>
         <tr><td colspan="2">Change To...<td>Rename a master by selecting the desired replacement esp/esm from the mods directory. It will add the
             plugin to the internal renames dictionary of Bash and bold it on any master list that it appears. Hit Save to edit the selected file
@@ -4757,14 +4757,12 @@ and masterlist relative priority and role see the LOOT docs.
             <td><code>-L&nbsp;LANGUAGE, --language=LANGUAGE</code>
             <td>Specify the user language overriding the system language
                 settings.
-    <thead>
-        <tr>
+        <tr class="tabttl">
             <th>Path Arguments
             <th>All path arguments must be absolute paths and use either
                 forward slashes (/) or two backward slashes (\\). All of these can
                 also be set in the ini (where you can also use relative paths) and
                 if set in both cmd line takes precedence.
-    <tbody>
         <tr>
             <td><code>-o&nbsp;OBLIVIONPATH,
                     --oblivionPath=OBLIVIONPATH</code>
@@ -4774,14 +4772,12 @@ and masterlist relative priority and role see the LOOT docs.
             Bash reads the windows registry to find supported games so this is not
             needed if the game entry is the only one present in the registry.
             See <a href="#install-alternate">Alternative Install Locations</a>
-    <thead>
-        <tr>
+        <tr class="tabttl">
             <th>User Directory Arguments
             <th>These arguments allow you to specify your user directories
                 in several ways. These are only useful if the regular procedure for
                 getting the user directory fails. And even in that case, the user is
                 probably better off installing win32com.
-    <tbody>
         <tr>
             <td><code>-p&nbsp;PERSONALPATH,
                     --personalPath=PERSONALPATH</code>
@@ -4797,12 +4793,10 @@ and masterlist relative priority and role see the LOOT docs.
                     --localAppDataPath=LOCALAPPDATAPATH</code>
             <td>Specify the user's local application data directory. If you
                 need to set this then you probably need to set <code>-p</code> too.
-    <thead>
-        <tr>
+        <tr class="tabttl">
             <th>Backup and Restore Arguments
             <th>These arguments allow you to do backup and restore settings
                 operations.
-    <tbody>
         <tr>
             <td><code>-b, --backup</code>
             <td>Backup all Bash settings to an archive file before the app
@@ -4856,7 +4850,7 @@ DELETE PROFILE %s AND THE %d SAVE FILES IT CONTAINS?
 <p>The file line is followed by the original text string on a new line, which is then followed by a line containing only <code>&gt;&gt;&gt;&gt;</code>. The translation entry ends with a final line containing the translated text string.
 <p><strong>Note:</strong> It is important that the formatting characters are not removed or moved or added to. Formatting characters are those that start with a percentage sign or a backslash, eg. <code> %s %d %08X \n</code>. If a formatting character is missing, Wrye Bash will throw an exception, which is bad.
     
-<script src="assets/bashslide.js" type="text/javascript"></script>
+<script src="assets/bashslide.js"></script>
 </body>
 
 </html>
