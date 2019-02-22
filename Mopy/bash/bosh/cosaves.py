@@ -39,32 +39,32 @@ def _unpack(ins, fmt, size): return struct_unpack(fmt, ins.read(size))
 
 class _AHeader(object):
     """Abstract base class for cosave headers."""
-    signature = 'OVERRIDE'
+    savefile_tag = 'OVERRIDE'
     __slots__ = ()
 
     def __init__(self, ins, cosave_path):
         """
-        The base constructor for headers checks if the expected signature for
-        this header matches the actual signature found in the file.
+        The base constructor for headers checks if the expected save file tag
+        for this header matches the actual tag found in the file.
 
         :param ins: The input stream to read from.
         :param cosave_path: The path to the cosave.
         """
-        # TODO Don't we have to use self.__class__.signature?
-        actual_signature = unpack_string(ins, len(self.signature))
-        if actual_signature != self.signature:
-            raise FileError(cosave_path, u'Signature wrong: got %r, but '
+        # TODO Don't we have to use self.__class__.savefile_tag?
+        actual_tag = unpack_string(ins, len(self.savefile_tag))
+        if actual_tag != self.savefile_tag:
+            raise FileError(cosave_path, u'Header tag wrong: got %r, but '
                                          u'expected %r' %
-                            (actual_signature, self.signature))
+                            (actual_tag, self.savefile_tag))
 
     def write_header(self, out):
         """
         Writes this header to the specified output stream. The base method just
-        writes the signature.
+        writes the save file tag.
 
         :param out: The output stream to write to.
         """
-        out.write(self.signature)
+        out.write(self.savefile_tag)
 
 class _xSEHeader(_AHeader):
     """Header for xSE cosaves."""
@@ -88,8 +88,8 @@ class _xSEHeader(_AHeader):
         _pack(out, '=I', self.oblivionVersion)
 
 class _PluggyHeader(_AHeader):
-    """Header for pluggy cosaves. Just checks signature and version."""
-    signature = 'PluggySave'
+    """Header for pluggy cosaves. Just checks save file tag and version."""
+    savefile_tag = 'PluggySave'
     __slots__ = ()
 
     def __init__(self, ins, cosave_path):
@@ -477,6 +477,8 @@ class xSECoSave(ACoSaveFile):
         self.cosave_path.untemp()
 
 class ObseCosave(xSECoSave):
+    # TODO Keep in mind that OBSE saves can contain pluggy chunks (with
+    # signature 0x2330, as shown here)
     signature = 'OBSE'
     _pluggy_signature = 0x2330
 
@@ -497,24 +499,24 @@ class FoseCosave(xSECoSave):
 def get_cosave_type(game_fsName):
     """:rtype: type"""
     if game_fsName == u'Oblivion':
-        _xSEHeader.signature = 'OBSE'
+        _xSEHeader.savefile_tag = 'OBSE'
         return ObseCosave
     elif game_fsName == u'Skyrim':
-        _xSEHeader.signature = 'SKSE'
+        _xSEHeader.savefile_tag = 'SKSE'
         return SkseCosave
     elif game_fsName == u'Skyrim Special Edition':
-        _xSEHeader.signature = 'SKSE'
+        _xSEHeader.savefile_tag = 'SKSE'
         _xSEChunk._espm_chunk_type = {'SDOM', 'DOML'}
         return SkseCosave
     elif game_fsName == u'Fallout4':
-        _xSEHeader.signature = 'F4SE'
+        _xSEHeader.savefile_tag = 'F4SE'
         _xSEChunk._espm_chunk_type = {'SDOM', 'DOML'}
         return F4seCosave
     elif game_fsName == u'Fallout3':
-        _xSEHeader.signature = 'FOSE'
+        _xSEHeader.savefile_tag = 'FOSE'
         return FoseCosave
     elif game_fsName == u'FalloutNV':
-        _xSEHeader.signature = 'NVSE'
+        _xSEHeader.savefile_tag = 'NVSE'
         return NvseCosave
     return None
 
