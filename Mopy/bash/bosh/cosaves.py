@@ -411,7 +411,6 @@ class xSECoSave(ACoSaveFile):
     chunk_type = _xSEChunk
     header_type = _xSEHeader
 
-    signature = 'OVERRIDE' # the cosave file signature, OBSE, SKSE etc
     _xse_signature = 0x1400 # signature (aka opcodeBase) of xSE plugin itself
     _pluggy_signature = None # signature (aka opcodeBase) of Pluggy plugin
     __slots__ = ('cosave_header', 'plugin_chunks')
@@ -428,7 +427,7 @@ class xSECoSave(ACoSaveFile):
         log(u'=' * 80)
         log(_(u'  Format version:   %08X') % (self.cosave_header.formatVersion,))
         log(_(u'  %s version:      %u.%u') % (
-            self.signature, self.cosave_header.obseVersion,
+            self.cosave_header.savefile_tag, self.cosave_header.obseVersion,
             self.cosave_header.obseMinorVersion,))
         log(_(u'  Game version:     %08X') % (self.cosave_header.oblivionVersion,))
         #--Plugins
@@ -479,21 +478,10 @@ class xSECoSave(ACoSaveFile):
 class ObseCosave(xSECoSave):
     # TODO Keep in mind that OBSE saves can contain pluggy chunks (with
     # signature 0x2330, as shown here)
-    signature = 'OBSE'
     _pluggy_signature = 0x2330
 
 class SkseCosave(xSECoSave):
-    signature = 'SKSE'
     _xse_signature = 0x0
-
-class F4seCosave(SkseCosave):
-    signature = 'F4SE'
-
-class NvseCosave(xSECoSave):
-    signature = 'NVSE'
-
-class FoseCosave(xSECoSave):
-    signature = 'FOSE'
 
 # Factory
 def get_cosave_type(game_fsName):
@@ -511,13 +499,13 @@ def get_cosave_type(game_fsName):
     elif game_fsName == u'Fallout4':
         _xSEHeader.savefile_tag = 'F4SE'
         _xSEChunk._espm_chunk_type = {'SDOM', 'DOML'}
-        return F4seCosave
+        return SkseCosave
     elif game_fsName == u'Fallout3':
         _xSEHeader.savefile_tag = 'FOSE'
-        return FoseCosave
+        return xSECoSave
     elif game_fsName == u'FalloutNV':
         _xSEHeader.savefile_tag = 'NVSE'
-        return NvseCosave
+        return xSECoSave
     return None
 
 #------------------------------------------------------------------------------
