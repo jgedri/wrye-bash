@@ -1628,7 +1628,9 @@ class MreBptd(MelRecord):
                       'limbReplacementScale'),
             MelString('NAM1','limbReplacementModel'),
             MelString('NAM4','goreEffectsTargetBone'),
-            MelBase('NAM5','textureFilesHashes'),
+            # Ignore texture hashes - they're only used for BSAs, but there is
+            # never a Bashed Patch 0.bsa
+            MelNull('NAM5'),
             ),
         )
     __slots__ = melSet.getSlotsUsed()
@@ -5041,7 +5043,9 @@ class MreProj(MelRecord):
                   ),
         MelGroup('models',
             MelString('NAM1','muzzleFlashPath'),
-            MelBase('NAM2','nam2_p'),
+            # Ignore texture hashes - they're only used for BSAs, but there is
+            # never a Bashed Patch 0.bsa
+            MelNull('NAM2'),
         ),
         MelStruct('VNAM','I','soundLevel',),
         )
