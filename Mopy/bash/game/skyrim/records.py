@@ -50,22 +50,13 @@ if brec.MelModel is None:
                     'MOD5': ('MOD5', 'MO5T', 'MO5S'),
                     'DMDL': ('DMDL', 'DMDT', 'DMDS'), }
 
-        class MelModelHash(MelBase):
-            """TextureHashes are not used for loose files and there is never a
-            Bashed Patch.bsa. So we read the record if present and then
-            discard it."""
-            def loadData(self, record, ins, sub_type, size_, readId):
-                MelBase.loadData(self, record, ins, sub_type, size_, readId)
-            def getSlotsUsed(self):
-                return ()
-            def setDefault(self, record): return
-            def dumpData(self, record, out): return
-
         def __init__(self, attr='model', subType='MODL'):
             """Initialize."""
             types = self.__class__.typeSets[subType]
             MelGroup.__init__(self, attr, MelString(types[0], 'modPath'),
-                              self.MelModelHash(types[1], 'textureHashes'),
+                              # Ignore texture hashes - they're only used for
+                              # BSAs, but there is never a Bashed Patch 0.bsa
+                              MelNull(types[1]),
                               MelMODS(types[2], 'alternateTextures'), )
 
         def debug(self, on=True):
