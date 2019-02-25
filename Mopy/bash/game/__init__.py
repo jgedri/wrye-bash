@@ -201,8 +201,8 @@ class GameInfo(object):
         voice_dir = [u'sound', u'voice']
 
     # INI setting used to setup Save Profiles
-    #  (section,key)
-    saveProfilesKey = (u'General', u'SLocalSavePath')
+    #  (section, key, prefix)
+    saveProfilesKey = (u'General', u'SLocalSavePath', u'Saves\\')
 
     # BAIN:
     #  These are the allowed default data directories that BAIN can install to

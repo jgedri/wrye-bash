@@ -3730,7 +3730,9 @@ class BashFrame(BaltFrame):
             title += u', CBash %s: ' % (CBashApi.VersionText,)
         else:
             title += u': '
-        maProfile = re.match(ur'Saves\\(.+)\\$',bosh.saveInfos.localSave,re.U)
+        save_prefix = re.escape(bush.game.saveProfilesKey[2])
+        maProfile = re.match(save_prefix + ur'(.+)\\$',
+                             bosh.saveInfos.localSave, re.U)
         if maProfile:
             title += maProfile.group(1)
         else:
