@@ -45,8 +45,8 @@ if brec.MelModel is None:
             types = self.__class__.typeSets[subType]
             MelGroup.__init__(
                 self, attr, MelString(types[0], 'modPath'),
-                # Ignore texture hashes - they're only used for BSAs, but there
-                # is never a Bashed Patch 0.bsa
+                # Ignore texture hashes - they're only an optimization, plenty
+                # of records in Skyrim.esm are missing them
                 MelNull(types[1]),
                 MelOptStruct(types[2], 'f', 'colorRemappingIndex'),
                 MelOptStruct(types[3], 'I', (FID,'materialSwap')),

@@ -54,8 +54,9 @@ if brec.MelModel is None:
             """Initialize."""
             types = self.__class__.typeSets[subType]
             MelGroup.__init__(self, attr, MelString(types[0], 'modPath'),
-                              # Ignore texture hashes - they're only used for
-                              # BSAs, but there is never a Bashed Patch 0.bsa
+                              # Ignore texture hashes - they're only an
+                              # optimization, plenty of records in Skyrim.esm
+                              # are missing them
                               MelNull(types[1]),
                               MelMODS(types[2], 'alternateTextures'), )
 
@@ -1628,8 +1629,8 @@ class MreBptd(MelRecord):
                       'limbReplacementScale'),
             MelString('NAM1','limbReplacementModel'),
             MelString('NAM4','goreEffectsTargetBone'),
-            # Ignore texture hashes - they're only used for BSAs, but there is
-            # never a Bashed Patch 0.bsa
+            # Ignore texture hashes - they're only an optimization, plenty of
+            # records in Skyrim.esm are missing them
             MelNull('NAM5'),
             ),
         )
@@ -5043,8 +5044,8 @@ class MreProj(MelRecord):
                   ),
         MelGroup('models',
             MelString('NAM1','muzzleFlashPath'),
-            # Ignore texture hashes - they're only used for BSAs, but there is
-            # never a Bashed Patch 0.bsa
+            # Ignore texture hashes - they're only an optimization, plenty of
+            # records in Skyrim.esm are missing them
             MelNull('NAM2'),
         ),
         MelStruct('VNAM','I','soundLevel',),
