@@ -286,10 +286,10 @@
             href="#bainHasExtraDirectories">Has Extra Directories</a> option. Even if Has Extra Directories option is checked, directories that are silently skipped will still be skipped.
     <strong>For a complex package,</strong> any top level files (with the exception of files that contain "readme" and variations in their name) will be also considered as belonging to a skipped directory
     and will be listed in the '== Skipped (Dir)' section. Top level means at the subpackages level, not inside a subpackage.
-    <li>Archives &amp; executables. Executable files, apart from Script Extender plugins if the <a href="#bainSkipOBSEPlugins">Skip OBSE Plugins</a> option is disabled, and archives in
+    <li>Archives &amp; executables. Executable files, apart from Script Extender plugins if the <a href="#bainSkipSEPlugins">Skip (**SE) Plugins</a> option is disabled, and archives in
     packages will be skipped. Files skipped because of this will be listed in the <q>Skipped</q> panel on the right on the <em>== Skipped (Extension)</em> section. The complete list of
     extensions skipped is:
-    <code>.001, .7z, .7z.001, .ace, .bz2, .db, .exe, .fomod, .gz, .lzma, .manifest, .omod, .py, .pyc, .rar, .tar, .tb2, .tgz, .zip</code>
+    <code>.001, .7z, .7z.001, .ace, .bz2, .ckm, .db, .exe, .fomod, .gz, .lzma, .manifest, .omod, .py, .pyc, .rar, .tar, .tb2, .tgz, .zip</code>
     This includes BCFs (they have a .7z extension) - still BAIN will detect those.
     <li>Espm files that are not in top level of the package/subpackage. It makes no sense to have those files in a subfolder, so those are skipped.
 </ul>
@@ -310,14 +310,14 @@ tab. The directories skipped are:
             <a href="#bainSkipLODNormals">Skip LOD Normals</a> are <strong>both</strong> checked
         <tr><td>docs<td colspan="2">If <a href="#bainSkipDocs">Skip Docs</a>  <strong>and</strong> <a href="#bainSkipImages">Skip Images</a> are
             <strong>both</strong> checked
-        <tr><td>Script extender (see game specific below)<td colspan="2">If <a href="#bainSkipOBSEPlugins">Skip OBSE Plugins</a> is checked
-        <tr><td>screenshots<td colspan="2">If <a href="#bainSkipScreenshots">Skip Screenshots</a> is checked (that may change as Skip Screenshots will
-            skip a screenshots directory in the package, whose contents would be currently installed in Data/Docs, not Data/Screenshots).
+        <tr><td>Script extender<td colspan="2">If <a href="#bainSkipSEPlugins">Skip (**SE) Plugins</a> is checked (see game specific below)
+        <tr><td>screenshots<td colspan="2">If <a href="#bainSkipScreenshots">Skip Screenshots</a> is checked <!-- (that may change as Skip Screenshots will
+            skip a screenshots directory in the package, whose contents would be currently installed in Data/Docs, not Data/Screenshots). -->
         <tr class="tabttl"><th colspan="3">Skipped file extensions
     <tbody>
-    <tr><td colspan="3">.001, .7z, .7z.001, .ace, .bz2, .db, .exe, .fomod, .gz, .lzma, .manifest, .omod, .py, .pyc, .rar, .tar, .tb2, .tgz, .zip
-    <tr class="tabttl" ><th colspan="3">Per game skipped Data subdirectories
-    <tr class="tabttl"><th>Game<th>Skipped Data subdirectories<td>Script extender(s) directories
+        <td colspan="3">.001, .7z, .7z.001, .ace, .bz2, .ckm, .db, .exe, .fomod, .gz, .lzma, .manifest, .omod, .py, .pyc, .rar, .tar, .tb2, .tgz, .zip
+    <tr class="tabttl"><th colspan="3">Per game skipped Data subdirectories
+    <tr class="tabttl"><th>Game<th>Skipped Data subdirectories<th>Script extender(s) directories
     <tbody>
         <tr><td>Oblivion<td>tes4edit backups, bgsee, conscribe logs<td>OBSE
         <tr><td>Fallout 3<td>fo3edit backups<td>FOSE
@@ -325,6 +325,20 @@ tab. The directories skipped are:
         <tr><td>Skyrim<td>tes5edit backups<td>SKSE, SkyProc, Script Dragon
         <tr><td>Fallout 4<td>fo4edit backups<td>F4SE
         <tr><td>Skyrim SE<td>sseedit backups<td>SKSE
+    <tr class="tabttl"><th colspan="3">Per game skipped file extensions</th></tr>
+    <tr class="tabttl"><th>Skipped file extension</th><th>Games</th><th>Notes</th></tr>
+    <tbody>
+      <tr>
+        <td>.bsl</td>
+        <td>Skyrim, Skyrim SE</td>
+        <td>If <a href="#bainSkipBSLFiles">Skip BSL Files</a> is checked</td>
+      </tr>
+      <tr>
+        <td>.psc</td>
+        <td>Skyrim, Skyrim SE, Fallout 4</td>
+        <td>If <a href="#bainSkipScriptSources">Skip Script Sources</a> is checked</td>
+      </tr>
+    </tbody>
 </table>
 
 <p>Skipping of Data subdirectories has some implications vis-à-vis uninstalling those skipped files. So say you turn Skip DistantLOD on, all packages
@@ -340,7 +354,7 @@ tab. The directories skipped are:
 <ul>
     <li>The package (or subpackage in the case of a Complex Bain) contains the OBSE plugin file inside <code>OBSE\Plugins\</code> (for
         Oblivion), or <code>SKSE\Plugins\</code> (for Skyrim) sub-folders.
-    <li>The <a href="#bainSkipOBSEPlugins">Skip OBSE Plugins</a> option found in the Installers tab column header context menu is disabled.
+    <li>The <a href="#bainSkipSEPlugins">Skip OBSE Plugins</a> option found in the Installers tab column header context menu is disabled.
 </ul>
 <p>When attempting to install a specific Script Extender plugin for the first time, Wrye Bash will display a warning dialogue and ask you to confirm or deny the plugin's installation. Thereafter you can uninstall and install the plugin as you like without seeing the warning. These additional requirements are due to the significant (though currently theoretical) dangers of installing executable files.
 <p>The list of allowed and disallowed Script Extender plugins can be imported and exported using the <a href="#settingsImportList">Import list of allowed/disallowed OBSE plugin dlls</a> and <a href="#settingsExportList">Export list of allowed/disallowed OBSE plugin dlls</a> options in Wrye Bash's <a href="#tools-settings">Settings</a> menu.
@@ -564,17 +578,21 @@ tab. The directories skipped are:
         </tr>
         <tr>
         <td id="bainGlobalSkips" rowspan="11">Global Skips</td>
+        <tr><td id="bainSkipSEPlugins">Skip OBSE Plugins<td><em>Oblivion only.</em> If this is checked, files to go in the Data\OBSE\Plugins folder will not be installed.
         <tr><td>Skip SKSE/Script Dragon Plugins<td><em>Skyrim only.</em> If this is checked, files to go in the Data\SKSE\Plugins or Data\asi folder will not be installed.
-        <tr><td id="bainSkipOBSEPlugins">Skip OBSE Plugins<td><em>Oblivion only.</em> If this is checked, files to go in the Data\OBSE\Plugins folder will not be installed.
         <tr><td id="bainSkipScreenshots">Skip Screenshots<td>If checked, then files from a Data\Screenshots directory will be skipped.
+        <tr>
+          <td id="bainSkipScriptSources">Skip Script Sources</td>
+          <td><em>Skyrim, Skyrim SE and Fallout 4 only.</em> If checked, loose script sources (.psc files) will be skipped.</td>
+        </tr>
         <tr><td id="bainSkipImages">Skip Images<td>If checked, image files will be skipped.
         <tr><td id="bainSkipDocs">Skip Docs<td>If checked, document files will be skipped vice being swept to the Docs\ directory.
         <tr><td id="bainSkipDistantLOD">Skip DistantLOD<td>If checked, then DistantLOD files in packages will be ignored. Useful if you're using Tes4LodGen to generate DistantLOD files.
         <tr><td id="bainSkipLODMeshes">Skip LOD Meshes<td>If checked, landscape LOD meshes will be skipped.
         <tr><td id="bainSkipLODTextures">Skip LOD Textures<td>If checked, landscape LOD textures will be skipped.
         <tr><td id="bainSkipLODNormals">Skip LOD Normals<td>If checked, landscape LOD normals will be skipped.
-        <tr><td id="bainSkipBSLFiles">Skip BSL Files<td><em>Skyrim only.</em> If checked, BSL Files will be skipped.
-        <tr><td  colspan="2" id="bainAutonameStringTranslationFiles">Auto-name String Translation Files<td><em>Skyrim only.</em> If checked, string translation files will be renamed so that they are loaded for the language Skyrim is currently run for, unless there are existing translation files for that language.
+        <tr><td colspan="2" id="bainSkipBSLFiles">Skip BSL Files<td><i>Skyrim and Skyrim SE only.</i> If checked, BSL Files will be skipped.
+        <tr><td colspan="2" id="bainAutonameStringTranslationFiles">Auto-name String Translation Files<td><i>Skyrim only.</i> If checked, string translation files will be renamed so that they are loaded for the language Skyrim is currently run for, unless there are existing translation files for that language.
 </table>
 </div>
 <div class="prlflex clearf">
@@ -765,7 +783,7 @@ tab. The directories skipped are:
         <tr>
             <td colspan="2" id="bainSkipVoices">Skip Voices</td>
             <td>If this is checked, Bain will skip over any voice files in the package. This is useful if the voice files are empty and/or the user prefers not to use them. If this option is used, then the user should also use Elys'
-                <a href="http://oblivion.nexusmods.com/mods/16622">Universal Silent Voice</a> extension to prevent dialog subtitles from fading too rapidly.</td>
+                <a href="https://www.nexusmods.com/oblivion/mods/16622">Universal Silent Voice</a> extension to prevent dialog subtitles from fading too rapidly.</td>
         </tr>
         <tr>
             <td colspan="2" id="bainDontRefresh">Don't Refresh</td>
@@ -997,7 +1015,7 @@ tab. The directories skipped are:
         <tr><td>Prices...<td>Exports the prices of objects in the selected plugin to a CSV file.
         <tr><td id="modsExportRelations">Relations...<td><strong>For advanced mod authors only.</strong> Exports the faction relationships in the selected plugin to a CSV file. This does not export race relationships. The CSV file can also be used in the Bashed Patch's Import Relations option.
         <tr><td id="modsExportIngredients">Ingredients...<td>Exports alchemy ingredient record data from the selected plugin to a CSV file.
-        <tr><td>Scripts...<td>Exports the scripts in the selected plugin to a series of text files. The scripts may then be edited in the text files and re-imported. <strong>Warning:</strong> Do not change the first three lines of each text file exported when editing unless you know what you're doing.
+        <tr><td>Scripts...<td>Exports the scripts in the selected plugin to a series of text files. The scripts may then be edited in the text files and re-imported. <br><br><strong>Warning:</strong> Do not change the first three lines of each text file exported when editing unless you know what you're doing.
         <tr><td id="modsExportSigilStones">Sigil Stones...<td>Exports the stats of sigil stones from the selected plugin to a CSV file.
         <tr><td id="modsExportSpellStats">Spells...<td>Exports spell stats in the selected plugin to a CSV file. The CSV file can also be used in the Bashed Patch's Import Stats option. There are two modes of export, Basic and Detailed. The spell stats exported in Basic mode are as follows.
             <ul>
@@ -1024,8 +1042,8 @@ tab. The directories skipped are:
                 <li>Soulgem
                 <li>Weapon
             </ul>
-        <tr><td rowspan="14">Import<td>Editor Ids...<td><strong>For advanced mod authors only.</strong> Imports the Editor IDs for records in the selected plugin from a CSV file. As well as updating the Editor IDs of records themselves, this also updates any Editor IDs referenced in normal (non quest stage or dialogue) scripts to reflect the changes. <strong>Note:</strong> You may have to recompile any altered scripts in the Construction Set.
-        <p>If you wish to update script references <em>after</em> the Editor IDs were changed, edit the CSV file and add another column after the eid column and give the old Editor IDs in the new column. E.g. <code>MISC Oblivion.esm 0x0123456 newEid oldEid</code>
+        <tr><td rowspan="14">Import<td>Editor Ids...<td><strong>For advanced mod authors only.</strong> Imports the Editor IDs for records in the selected plugin from a CSV file. As well as updating the Editor IDs of records themselves, this also updates any Editor IDs referenced in normal (non quest stage or dialogue) scripts to reflect the changes.<br><br><strong>Note:</strong> You may have to recompile any altered scripts in the Construction Set.
+            <br><br>If you wish to update script references <em>after</em> the Editor IDs were changed, edit the CSV file and add another column after the eid column and give the old Editor IDs in the new column. E.g. <code>MISC Oblivion.esm 0x0123456 newEid oldEid</code>
         <tr><td id="modsImportFactions">Factions...<td><strong>For advanced mod authors only.</strong> Applies to the selected plugin the factions defined for actors in a CSV file previously exported using Wrye Bash.
         <tr><td id="modsImportNames">Names...<td>Imports names for objects from a CSV file (or other mod) into the selected plugin. Only records that already exist in the plugin will have their names changed, no records will be added.
         <tr><td id="modsImportNPCLevels">NPC Levels...<td><strong>For advanced mod authors only.</strong> Imports NPC level info from a CSV file into the selected plugin. This does not affect Creature levels or leveled lists, nor does it affect the levels of NPCs in existing saves, for which <a href="#savesUpdateNPCLevels">Update NPC Levels</a> must be used. As well as the format exported by <a href="#modsExportNPCLevels">Export NPC Levels</a>, an older format is supported:
@@ -1039,7 +1057,7 @@ tab. The directories skipped are:
         <tr><td>Prices...<td>Imports the prices of objects from a CSV file (or other mod) into the selected plugin.
         <tr><td id="modsImportRelations">Relations...<td><strong>For advanced mod authors only.</strong> Imports faction relationships from a CSV file into the selected plugin.
         <tr><td id="modsImportIngredients">Ingredients...<td>Imports alchemy ingredient record data from a CSV file into the selected plugin.
-        <tr><td>Scripts...<td>Imports scripts from a series of text files into the selected plugin. <strong>Note:</strong> You must recompile any altered or new scripts in the Construction Set.
+        <tr><td>Scripts...<td>Imports scripts from a series of text files into the selected plugin.<br><br><strong>Note:</strong> You must recompile any altered or new scripts in the Construction Set.
         <tr><td id="modsImportSigilStones">Sigil Stones...<td>Imports the stats of sigil stones from a CSV file into the selected plugin.
         <tr><td id="modsImportSpellStats">Spells...<td>Imports spell stats from a CSV file into the selected plugin. Only records that exist in the plugin will have their spell stats change, no records will be added. The spell stats supported are those exported by <a href="#modsExportSpellStats">Export Spell Stats...</a>, and importing uses the same Basic and Detailed mode distinctions.
         <tr><td id="modsImportStats">Stats...<td>Imports stats from a CSV file into the selected plugin. Only records that exist in the plugin will have their stats change, no records will be added. The object stats supported are those exported by <a href="#modsExportStats">Export Stats...</a>.
@@ -1060,16 +1078,16 @@ tab. The directories skipped are:
                 <p>Note that if either of the new or old sides of a row are empty, the row will be skipped. Also, the new object does not have to be of the same type as the old object, but they should be compatible.
                 <li>Save the new CSV file so that its filename ends with <q>Formids.csv</q>.
             </ol>
-            <p>If you've completely swapped from one base plugin to another, you may wish to remove the old dependency. This can be done using TES4Edit's <q>Clean Masters</q> command or TES4Gecko's <q>Edit Master List</q> command. The former only removes totally unused masters while the latter can remove used masters with the appropriate cleanup, and is not an automated procedure.
-            <p><strong>Note:</strong> You can also use TES4Edit to change the Form IDs using its <q>Batch Change Referencing Records</q> command together with the CSV file created. TES4Edit will also change the definition of a Form ID, rather than just any references to it, unlike Wrye Bash.
+            <p>If you've completely swapped from one base plugin to another, you may wish to remove the old dependency. This can be done using TES4Edit's <q>Clean Masters</q> command or TES4Gecko's <q>Edit Master List</q> command. The former only removes totally unused masters while the latter can remove used masters with the appropriate cleanup, and is not an automated procedure.</p>
+            <strong>Note:</strong> You can also use TES4Edit to change the Form IDs using its <q>Batch Change Referencing Records</q> command together with the CSV file created. TES4Edit will also change the definition of a Form ID, rather than just any references to it, unlike Wrye Bash.
         <tr><td rowspan="6">Mod Cleaning<td>Don't check against BOSS's dirty mod list<td>Overrides the setting in the column header context menu for the specific plugin(s) selected.
         <tr><td id="modsScanForDirtyEdits">Scan for Dirty Edits<td><em>Oblivion only.</em> Scans the selected plugin for Identical To Master records and deleted references, outputting counts of the dirty edits found. The dirty edit counts may differ from the output provided by TES4Edit as that includes other "junk" records in the <abbr title="Identical To Master record">ITM</abbr> count. Wrye Bash does not count these junk records as they are non-harmful.
         <tr><td>Scan for <abbr title="Undeleted and Disabled Reference">UDR</abbr><td><em>Skyrim only.</em> Behaves as the above <a href="#modsScanForDirtyEdits">Scan for Dirty Edits</a>, but only for deleted references.
         <tr><td id="modsRemoveWorldOrphans">Remove World Orphans<td>Some plugins have a mild form of corruption where exterior cells of new worldspaces in an esp master of the plugin are included in the plugin even if they are not edited, but the parent worldspace is not included, creating "orphaned" cells. This command removes these "orphans".
-        <tr><td id="modsNvidiaFogFix">Nvidia Fog Fix<td>Systems with Nvidia graphics cards can suffer a black screen bug when interior cell fog distances are set to 0. This command scans the selected plugin(s) and sets any zero-valued fog distances to 0.001. <strong>It is advised that mod authors use this on their mods before release.</strong>
+        <tr><td id="modsNvidiaFogFix">Nvidia Fog Fix<td>Systems with Nvidia graphics cards can suffer a black screen bug when interior cell fog distances are set to 0. This command scans the selected plugin(s) and sets any zero-valued fog distances to 0.001.<br><br><strong>It is advised that mod authors use this on their mods before release.</strong>
         <tr><td id="modsUndeleteRefs">Undelete Refs<td><strong>This is an experimental feature for advanced mod authors. If you're trying to undelete references, you should probably use TES4Edit instead.</strong> Deleted references can cause crashes. This command undeletes references and disables them instead. However, the undeleted reference does not contain the missing data caused by deletion. TES4Edit can add this data back in.
-        <tr><td colspan="2">Add Master...<td>Adds specified master to the list of masters for the selected plugin, thus ceding ownership of new content
-            of this mod to the new master. Useful for splitting mods into esm/esp pairs. <strong>Warning:</strong> For advanced mod authors only.
+        <tr><td colspan="2">Add Master...<td><strong>Note: Currently Disabled.</strong> Adds specified master to the list of masters for the selected plugin, thus ceding ownership of new content
+            of this mod to the new master. Useful for splitting mods into esm/esp pairs.<br><br><strong>Warning:</strong> For advanced mod authors only.
             You should only use this if you know exactly what you're doing: adding a master through Bash does not update record FormIDs,
             so new content added by the mod will now seem added by the mod's new master (the "cedes ownership" part above) - resulting in
             the mod marked as mergeable - info from Arthmoor and Lojack here: http://forums.bethsoft.com/topic/1536340-wrye-bash-thread-105/page-3#entry24345148
@@ -1081,14 +1099,14 @@ tab. The directories skipped are:
             extensions, but on a bit in the file. This command toggles this bit so that .esp files behave as .esm files and vice versa. It is
             useful for creating and editing plugins with .esp files as masters, which cannot be done in the Construction Set otherwise.
             Esm files cannot be edited in the Construction Set as esp files, so this command is disabled for them. NB: the file extension won't change
-            and this is used by Bash so do not mess with it. <strong>Warning:</strong> Make sure to toggle any plugins back before playing the game, otherwise
+            and this is used by Bash so do not mess with it.<br><br><strong>Warning:</strong> Make sure to toggle any plugins back before playing the game, otherwise
             savegames will get confused, possibly causing bugs and corruption. To toggle the masters back use the same command on the plugin which
             should now be named Espify Self.
         <tr><td colspan="2" id="modsEsmifyMasters">Esmify/Espify Masters<td>This works as <a href="#modsEsmifySelf">Esmify/Espify Self</a> does,
             but toggles a plugin's masters rather than the plugin itself. The load order of plugins will change to reflect their new status but
             since the modification time won't change they will revert back to their original positions for modification time based load orders.
             Be sure to backup your load order for Skyrim.
-        <tr><td colspan="2" id="modsVersion0.8">Version 0.8<td>Resets the file version number of the selected plugin so that it can be edited in an older version of the Construction Set, which is required when making certain changes due to bugs in the latest Construction Set. <strong>Warning:</strong> It is possible that this may cause data loss.
+        <tr><td colspan="2" id="modsVersion0.8">Version 0.8<td>Resets the file version number of the selected plugin so that it can be edited in an older version of the Construction Set, which is required when making certain changes due to bugs in the latest Construction Set.<br><br><strong>Warning:</strong> It is possible that this may cause data loss.
 </table>
 
 <table>
@@ -1123,7 +1141,7 @@ tab. The directories skipped are:
 <h2 id="patch">Advanced Bashed Patch</h2>
 <p>You can have multiple Bashed Patches, though one is generally enough per <a href="#saves-profiles">save profile</a> or character. The only requirement for Wrye Bash recognising a plugin as a Bashed Patch is that its <q>Author</q> field is set to <q>BASHED PATCH</q>, so you can name a Bashed Patch whatever you want.
 <h3 id="patch-view">Viewing &amp; Editing The Bashed Patch</h3>
-<p>As the Bashed Patch commonly has .esp files as masters, viewing and editing it can be more complicated than for the average plugin. If you wish to view its contents, it is easiest to use <a href="http://oblivion.nexusmods.com/mods/11536">TES4Edit</a>, which can also be used to edit most types of data in plugins. To edit it using the Construction Set or Creation Kit (required when editing scripts), you'll need to first use the <a href="#modsEsmifyMasters">Esmify Masters</a> command on it. Be sure to use <q>Espify Masters</q> before attempting to play the game.
+<p>As the Bashed Patch commonly has .esp files as masters, viewing and editing it can be more complicated than for the average plugin. If you wish to view its contents, it is easiest to use <a href="https://www.nexusmods.com/oblivion/mods/11536">TES4Edit</a>, which can also be used to edit most types of data in plugins. To edit it using the Construction Set or Creation Kit (required when editing scripts), you'll need to first use the <a href="#modsEsmifyMasters">Esmify Masters</a> command on it. Be sure to use <q>Espify Masters</q> before attempting to play the game.
 
 <h3 id="patch-tags">Bash Tags</h3>
 <p>Wrye Bash uses a tagging system to determine what mods can and should have which records available for importing into the Bashed Patch. These Bash Tags are specified by mod authors in the header descriptions of their plugins, or are applied using data from LOOT's masterlist and userlist files.
@@ -1269,6 +1287,15 @@ and masterlist relative priority and role see the LOOT docs.
             </td>
         </tr>
         <tr>
+          <td>C.ForceHideLand</td>
+          <td>Modifies cell Force Hide Land flags.</td>
+          <td>The Force Hide Land flags field in the Grid (XCLC) subrecord in Cell (CELL) records.
+            <br>
+            <br>
+            <strong>Available for Skyrim and Skyrim&colon; Special Edition Only.</strong>
+          </td>
+        </tr>
+        <tr>
             <td>C.ImageSpace</td>
             <td>Modifies cell ImageSpace.</td>
             <td>The Image Space (XCIM) subrecord in Cell (CELL) records.
@@ -1342,13 +1369,13 @@ and masterlist relative priority and role see the LOOT docs.
             </td>
         </tr>
         <tr>
-            <td>C.LockList</td>
-            <td>Modifies cell lock list.</td>
-            <td>The lock list (XILL) subrecord in cell (CELL) records.
-                <br>
-                <br>
-                <strong>Available for Skyrim Only.</strong>
-            </td>
+          <td>C.LockList</td>
+          <td>Modifies cell lock list.</td>
+          <td>The lock list (XILL) subrecord in cell (CELL) records.
+            <br>
+            <br>
+            <strong>Available for Skyrim and Skyrim&colon; Special Edition Only.</strong>
+          </td>
         </tr>
         <tr>
             <td>C.Location</td>
@@ -1422,7 +1449,7 @@ and masterlist relative priority and role see the LOOT docs.
             <td>Any (XCLR) subrecord of the Cell (CELL) record.
                 <br>
                 <br>
-                <strong>Available for Skyrim Only.</strong>
+                <strong>Available for Oblivion, Skyrim and Skyrim&colon; Special Edition Only.</strong>
             </td>
         </tr>
         <tr>
@@ -3524,7 +3551,6 @@ and masterlist relative priority and role see the LOOT docs.
                     <li>(ENCH) Object Effect</li>
                     <li>(EXPL) Explosion</li>
                     <li>(EYES) Eyes</li>
-                    <li>(FACT) Faction</li>
                     <li>(FLOR) Flora</li>
                     <li>(FURN) Furniture</li>
                     <li>(HAZD) Hazard</li>
@@ -4008,7 +4034,7 @@ and masterlist relative priority and role see the LOOT docs.
         <tr><td>No Light Fade Value Fix<td>Sets the fade values on all lights to a default of 1.0 if not already set.
         <tr><td>No Light Flicker<td>Turns off flickering effects for lights. May help on machines with low end graphic cards.
         <tr><td>Number of uses for pre-enchanted weapons and Staffs/Staves<td>The charge amount and cast cost will be edited so that all enchanted weapons and staffs have the amount of uses specified. Cost will be rounded up to 1 (unless set to unlimited) so number of uses may not exactly match for all weapons.
-        <tr><td>Nvidia Fog Fix<td>Ensures that cells have at least one non-zero fog value. For avoiding the Nvidia fog-related black screen. This feature is based on <a href="http://www.nexusmods.com/oblivion/mods/11167/?">Quarn's Nvidia Black Screen Fix</a>.
+        <tr><td>Nvidia Fog Fix<td>Ensures that cells have at least one non-zero fog value. For avoiding the Nvidia fog-related black screen. This feature is based on <a href="https://www.nexusmods.com/oblivion/mods/11167/?">Quarn's Nvidia Black Screen Fix</a>.
         <tr><td>Reweigh: Arrows<td>Reweighs arrows to a maximum weight.
         <tr><td>Reweigh: Ingredients<td>Reweighs ingredients to a maximum weight.
         <tr><td>Reweigh: Potions (Maximum)<td>Reweighs potions to a maximum weight. This does not affect potions with script effects or with current weight &gt;= 1.0. Thus it should not affect alcoholic beverages or scripted "potions" like HTS water skins. Note that this is similar to, but not the same as, the Reweigh Potions command for savegames, which reweighs user created potions rather than mod created potions.
@@ -4140,7 +4166,7 @@ and masterlist relative priority and role see the LOOT docs.
     <tbody>
         <tr><td rowspan="2">Replace Form IDs<td>P1DCandles_Formids<td>Replaces the Form IDs of various candles to reference equivalents supplied by P1D's Candles For Kleptos.
         <tr><td>TI to Cobl_Formids<td>Replaces ingredients added by Tamrielic Ingredients with equivalents added by Cobl.
-        <tr><td rowspan="5">Import Names<td>Guard_Names<td>Based on <a href="http://oblivion.nexusmods.com/mods/2326">Flak's Complete Names Project</a>, this CSV file gives unique names to guards, legion soldiers, couriers and a few other NPCs and creatures with generic names. It covers both vanilla Oblivion and Oscuro's Oblivion Overhaul.
+        <tr><td rowspan="5">Import Names<td>Guard_Names<td>Based on <a href="https://www.nexusmods.com/oblivion/mods/2326">Flak's Complete Names Project</a>, this CSV file gives unique names to guards, legion soldiers, couriers and a few other NPCs and creatures with generic names. It covers both vanilla Oblivion and Oscuro's Oblivion Overhaul.
         <tr><td>OOO_Potion_Names<td>Renames the alcoholic beverages back to vanilla names for those that don't like OOO's method of renaming them.
         <tr><td>Random_NPC_Alternate_Names<td>Does the same as <a href="#patchRandomNPCNames">Random NPC Names</a> above, but using different names.
         <tr><td id="patchRandomNPCNames">Random_NPC_Names<td>Gives unique names to generically named NPCs and renames some others from the following mods:
